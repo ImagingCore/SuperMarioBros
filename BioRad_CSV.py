@@ -4,15 +4,6 @@ import sys
 import csv
 
 
-# unicode check
-# try:
-#     import unicodecsv as csv
-# except ImportError:
-#     import warnings
-#     warnings.warn("can't import `unicodecsv` encoding errors may occur")
-#     import csv
-#     
-    
 print "Enter full filepath of folder containing BioRad csv file"
 a_path = raw_input("> ")
 
