@@ -45,6 +45,10 @@ def writeShortCSV(inputfile,outputfile,fnames_keep):
                 #for k,v in row.items():
                     #print k,v
 
+
+
+
+
 print('Modified CSV file saved as:  ' + outputfile)
 # ------------------           
 
