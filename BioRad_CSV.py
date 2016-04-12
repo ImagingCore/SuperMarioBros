@@ -3,32 +3,44 @@ import os
 import sys
 import csv
 
+# comment the following line if using GUI
+print "Enter full filepath of BioRad csv file"
+inputfile = raw_input("> ")
 
-print "Enter full filepath of folder containing BioRad csv file"
-a_path = raw_input("> ")
+# fieldnames to keep (MARK's samples)
+fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
 
-# error checking
-if os.path.exists(a_path):
-    print "File exists!"
-    #print('Path is %s, file is %s, filebasename is %s' % (path,filename,root))
-else:
-    print 'That is not a valid path!'
-    sys.exit(1) #gracefully exit Python
-      
-# get file parts for outputfile
-path, filename = os.path.split(a_path)
-root, ext = os.path.splitext(filename)
-    
-# fieldnames to keep    
-fnames_keep = ['Well','Sample','Target','CopiesPer20uLWell'] 
 
-# fullfilepath for outputfile
-outputfile = path + '/' + root +'_MOD.csv'
-      
-    
+
+# ----------------
+def getOutputFileName(inputfile):
+    # create output filename with same root and path as input file, adding the suffix _MOD
+
+
+    # error checking
+    if not os.path.isfile(inputfile):
+        print 'That is not a valid file!'
+        sys.exit(1) #gracefully exit Python
+    else:
+        print 'File exists!'
+        # parse fullefilepath
+        path, filename = os.path.split(inputfile)
+        root, ext = os.path.splitext(filename)
+
+        # fullfilepath for outputfile
+        outputfile = path + '/' + root +'_MOD.csv'
+        print outputfile
+        return outputfile
+
+
+
+
 # -------------
-def writeShortCSV(inputfile,outputfile,fnames_keep): 
-    
+def writeShortCSV(inputfile,fnames_keep):
+
+    outputfile = getOutputFileName(inputfile)
+    print outputfile
+
     with open(outputfile,'w') as csvoutfile: # open output file
         writer = csv.DictWriter(csvoutfile,fieldnames=fnames_keep,extrasaction='ignore')
         writer.writeheader()
@@ -40,19 +52,11 @@ def writeShortCSV(inputfile,outputfile,fnames_keep):
             for row in reader:   # iterate over rows, each row is a dict
                 writer.writerow(row)
 
-                
-                # view key, value pairs in each dict / row
-                #for k,v in row.items():
-                    #print k,v
 
-
-
-
-
-print('Modified CSV file saved as:  ' + outputfile)
+#print('Modified CSV file saved as:  ' + outputfile)
 # ------------------           
 
-writeShortCSV(a_path,outputfile,fnames_keep)
+writeShortCSV(inputfile,fnames_keep)
     
     
     
@@ -72,30 +76,26 @@ def getUniqueValues(fullfilepath):
             unique_samples.add(row['Sample'])
 
     return unique_samples, unique_targets
- # ---------------------  
-   
-modifiedFile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/LIVER \
-20160220 WTA SCALEUP PLATE 1 MK_MOD.csv'    
+ # ---------------------
 
-getUniqueValues(modifiedFile)
+#getUniqueValues(modifiedFile)
 
 
 
 
 # --------------------------
 import pandas as pd
-import numpy as np
 
 def addPivotTableToCSV(fullfilepath):
 
     df = pd.read_csv(fullfilepath) # load as a dataframe
 
     # get file parts for outputfile
-    path, filename = os.path.split(fullfilepath)
-    root, ext = os.path.splitext(filename)
+    #path, filename = os.path.split(fullfilepath)
+    #root, ext = os.path.splitext(filename)
 
     # fullfilepath for outputfile
-    outputfile = path + '/' + root + '_MOD2.csv'
+    #outputfile = path + '/' + root + '_MOD2.csv'
 
 
     # find duplicates in data
@@ -127,9 +127,7 @@ def addPivotTableToCSV(fullfilepath):
 
     merged_data = pd.concat([df,pv_table], axis=1, join_axes=[df.index])
 
-    merged_data.to_csv(outputfile)
-
-
+    merged_data.to_csv(fullfilepath)
 
 
 
