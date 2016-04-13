@@ -11,7 +11,6 @@ inputfile = raw_input("> ")
 fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
 
 
-
 # ----------------
 def getOutputFileName(inputfile):
     # create output filename with same root and path as input file, adding the suffix _MOD
@@ -31,7 +30,6 @@ def getOutputFileName(inputfile):
         outputfile = path + '/' + root +'_MOD.csv'
         print outputfile
         return outputfile
-
 
 
 # -------------
