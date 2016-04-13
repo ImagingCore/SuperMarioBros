@@ -3,6 +3,8 @@ import tkFileDialog
 from os import path
 import csv
 import BioRad_CSV
+import inspect
+
 
 
 
@@ -17,34 +19,58 @@ class CsvGuiClass(Frame):
 
 
     # Opens file selection window. Calls OpeanAndRead from this class (to be altered)
-    def fileSelect(self):
-        self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV","*.csv")])
-
-
+    def fileSelect(self,optionChoice):
 
         #  *************** file operations and other action calls to be implemented here ***************
         #
         #                                    FILE OPERATION CALLS
-
-        BioRad_CSV.pivotMe(self.filename)
-
+        if optionChoice == 1:
+            print "Option 1: under development"
+        elif optionChoice == 2:
+            print "Option 2: under development"
+        elif optionChoice == 3:
+            self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
+            BioRad_CSV.pivotMe(self.filename)
+        else:
+            print "ERROR: else condition inside fileSelect"
         #
         #
         #  *********************************************************************************************
 
 
     def iconClick(self,masterIn):
+
+        # get the name of the outside function calling iconClick
+        calledBy = inspect.currentframe().f_back.f_code.co_name
+
+
         def icOn():
             self.third_handle.grid_forget()
             self.start_handle.grid(row=1, columnspan=2, sticky=N)
         def icOff():
             self.start_handle.grid_forget()
             self.third_handle.grid(row=1, columnspan=2, sticky=N)
-            self.fileSelect()
+
+            # Check against which option is chosen by comparing against\
+            #  the name of the function that called iconClick
+            if calledBy == "firstOptionClick":
+                self.fileSelect(1)
+            elif calledBy == "secondOptionClick":
+                self.fileSelect(2)
+            elif calledBy == "thirdOptionClick":
+                self.fileSelect(3)
+            else:
+                print "ERROR: else condition inside iconClick"
+
         masterIn.after(25, icOn)
         masterIn.after(300, icOff)
-    # Button actions
-    def fileSelectClick(self,event):
+
+    # Click option actuation functions
+    def firstOptionClick(self, event):
+        self.iconClick(self.master)
+    def secondOptionClick(self, event):
+        self.iconClick(self.master)
+    def thirdOptionClick(self, event):
         self.iconClick(self.master)
 
 
@@ -83,11 +109,13 @@ class CsvGuiClass(Frame):
             self.start_handle.grid(row=1,columnspan=2, sticky=N)
         def showFirst():
             self.first_handle.grid(row=1,columnspan=2, sticky=N)
+            self.first_handle.bind("<Button-1>", self.firstOptionClick)
         def showSecond():
             self.second_handle.grid(row=1,columnspan=2, sticky=N)
+            self.second_handle.bind("<Button-1>", self.secondOptionClick)
         def showThird():
             self.third_handle.grid(row=1,columnspan=2, sticky=N)
-            self.third_handle.bind("<Button-1>", self.fileSelectClick)
+            self.third_handle.bind("<Button-1>", self.thirdOptionClick)
 
         # Status bar display functions called by motionMouse
         def statNone():
