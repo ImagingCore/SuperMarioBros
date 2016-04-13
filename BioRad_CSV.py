@@ -3,6 +3,8 @@ import os
 import sys
 import csv
 import pandas as pd
+import sys
+sys.dont_write_bytecode = True
 
 
 

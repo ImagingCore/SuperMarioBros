@@ -3,6 +3,8 @@ import tkFileDialog
 from os import path
 import csv
 import BioRad_CSV
+import sys
+sys.dont_write_bytecode = True
 
 
 
