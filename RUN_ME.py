@@ -1,6 +1,5 @@
 import GUI_Module_v2_3
-import sys
-sys.dont_write_bytecode = True
+
 
 
 
