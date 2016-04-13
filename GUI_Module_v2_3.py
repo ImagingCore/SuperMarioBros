@@ -1,11 +1,10 @@
 from Tkinter import *
 import tkFileDialog
-from os import path
-import csv
 import BioRad_CSV
 import inspect
-import time
 
+#from os import path
+#import csv
 
 
 class CsvGuiClass(Frame):
@@ -15,7 +14,9 @@ class CsvGuiClass(Frame):
     EXIT_PROGRAM = "Exit!"
     MAIN_WIN_WIDTH = 380  # not in use
     MAIN_WIN_HEIGHT = 200  # not in use
-
+    STATUS_LABEL1 = " -- Option1 -- [in development]"
+    STATUS_LABEL2 = " -- Option2 -- [in development]"
+    STATUS_LABEL3 = " >> BioRad file processing "
 
     # Opens file selection window. Calls OpeanAndRead from this class (to be altered)
     def Operations(self, optionChoice):
@@ -25,14 +26,14 @@ class CsvGuiClass(Frame):
         #
         #                                    FILE OPERATION CALLS
         if optionChoice == 1:
-            print "Option 1: under development"
+            foo = None
         elif optionChoice == 2:
-            print "Option 2: under development"
+            foo = None
         elif optionChoice == 3:
             self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
             BioRad_CSV.pivotMe(self.filename)
         else:
-            print "ERROR: else condition inside fileSelect"
+            print "INTERNAL ERROR: else condition inside fileSelect"
         #
         #
         #  *********************************************************************************************
@@ -45,8 +46,8 @@ class CsvGuiClass(Frame):
         calledBy = inspect.currentframe().f_back.f_code.co_name
 
         def icOn(handle_name):
-                handle_name.grid_forget()
-                self.start_handle.grid(row=1, columnspan=2, sticky=N)
+            handle_name.grid_forget()
+            self.start_handle.grid(row=1, columnspan=2, sticky=N)
         def icOff1():
             self.start_handle.grid_forget()
             self.first_handle.grid(row=1, columnspan=2, sticky=N)
@@ -61,20 +62,20 @@ class CsvGuiClass(Frame):
         #  the name of the function that called iconClick
         if calledBy == "firstOptionClick":
             masterIn.after(25, icOn(self.first_handle))
-            masterIn.after(200, icOff1)
+            masterIn.after(300, icOff1)
             self.Operations(1)
 
         elif calledBy == "secondOptionClick":
             masterIn.after(25, icOn(self.second_handle))
-            masterIn.after(200, icOff2)
+            masterIn.after(300, icOff2)
             self.Operations(2)
 
         elif calledBy == "thirdOptionClick":
             masterIn.after(25, icOn(self.third_handle))
-            masterIn.after(200, icOff3)
+            masterIn.after(300, icOff3)
             self.Operations(3)
         else:
-            print "ERROR: else condition inside iconClick"
+            print "INTERNAL ERROR: else condition inside iconClick"
 
 
     # Click option actuation functions
@@ -130,13 +131,13 @@ class CsvGuiClass(Frame):
             self.third_handle.bind("<Button-1>", self.thirdOptionClick)
 
         # Status bar display functions called by motionMouse
-        def statNone():
+        def statusNone():
             self.stat_label_None.grid(row=2, column=0, sticky=W)
-        def statOne():
+        def statusOne():
             self.stat_label_1.grid(row=2, column=0, sticky=W)
-        def statTwo():
+        def statusTwo():
             self.stat_label_2.grid(row=2, column=0, sticky=W)
-        def statThree():
+        def statusThree():
             self.stat_label_3.grid(row=2, column=0, sticky=W)
 
         # Mouse tracking functionality. Highlighting screen objects
@@ -155,7 +156,7 @@ class CsvGuiClass(Frame):
                     self.stat_label_None.grid_forget()
                     self.stat_label_2.grid_forget()
                     self.stat_label_3.grid_forget()
-                    statOne()
+                    statusOne()
                 else:
                     foo = None
                     #print "else condition"
@@ -169,7 +170,7 @@ class CsvGuiClass(Frame):
                     self.stat_label_None.grid_forget()
                     self.stat_label_1.grid_forget()
                     self.stat_label_3.grid_forget()
-                    statTwo()
+                    statusTwo()
                 else:
                     foo = None
                     #print "else condition"
@@ -183,7 +184,7 @@ class CsvGuiClass(Frame):
                     self.stat_label_None.grid_forget()
                     self.stat_label_1.grid_forget()
                     self.stat_label_2.grid_forget()
-                    statThree()
+                    statusThree()
                 else:
                     foo = None
                     #print "else condition"
@@ -196,16 +197,16 @@ class CsvGuiClass(Frame):
                 self.stat_label_1.grid_forget()
                 self.stat_label_2.grid_forget()
                 self.stat_label_3.grid_forget()
-                statNone()
+                statusNone()
 
         # To enable mouse tracking (i.e. root.bind('<Motion>', motionMouse))
         masterIn.bind('<Motion>', motionMouse)
 
         # Status labels (bottom left)
         self.stat_label_None = Label(masterIn,text=" ", fg='blue')
-        self.stat_label_1 = Label(masterIn, text=" -- Option1 -- [in development]", font=("Arial", 14, "italic"), fg='gray')
-        self.stat_label_2 = Label(masterIn, text=" -- Option2 -- [in development]", font=("Arial", 14, "italic"), fg='gray')
-        self.stat_label_3 = Label(masterIn, text=" >> BioRad file processing ", font=("Arial", 14, "italic"), fg='blue')
+        self.stat_label_1 = Label(masterIn, text=self.STATUS_LABEL1, font=("Arial", 14, "italic"), fg='gray')
+        self.stat_label_2 = Label(masterIn, text=self.STATUS_LABEL2, font=("Arial", 14, "italic"), fg='gray')
+        self.stat_label_3 = Label(masterIn, text=self.STATUS_LABEL3, font=("Arial", 14, "italic"), fg='blue')
         # Exit button (bottom right
         self.button2 = Button(masterIn, text=self.EXIT_PROGRAM, font=("Arial", 16), command=self.quit)
         # Version label (top right)
@@ -230,26 +231,26 @@ class CsvGuiClass(Frame):
 
 
 
-class FileOps():                # Class currently not implemented
-
-    # Accepts 1) path-file object, 2)the number of rows, 3) number of columns
-    # Performs error checking against .csv extension
-    # Reads the csv file row by row. Prints out results in a "matrix" form
-    # No return
-    def openAndRead(self, file, rows, col):
-        # Error checking. Report an error if not a csv file
-        fileExtention = str(path.basename(file))
-        if (fileExtention[-3:] != "csv"):
-            print "\n Pick a CSV file! \n"
-
-        else:
-            with open(file, "r") as csvfile:
-                reader = csv.reader(csvfile, delimiter=',')
-                k = 0;
-                for row in reader:
-                    while (k < rows):
-                        print (row[0:col])
-                        k = k + 1
+# class FileOps():                # Class currently not implemented
+#
+#     # Accepts 1) path-file object, 2)the number of rows, 3) number of columns
+#     # Performs error checking against .csv extension
+#     # Reads the csv file row by row. Prints out results in a "matrix" form
+#     # No return
+#     def openAndRead(self, file, rows, col):
+#         # Error checking. Report an error if not a csv file
+#         fileExtention = str(path.basename(file))
+#         if (fileExtention[-3:] != "csv"):
+#             print "\n Pick a CSV file! \n"
+#
+#         else:
+#             with open(file, "r") as csvfile:
+#                 reader = csv.reader(csvfile, delimiter=',')
+#                 k = 0;
+#                 for row in reader:
+#                     while (k < rows):
+#                         print (row[0:col])
+#                         k = k + 1
 
 
 
