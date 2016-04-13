@@ -3,9 +3,6 @@ import tkFileDialog
 import BioRad_CSV
 import inspect
 
-#from os import path
-#import csv
-
 
 class CsvGuiClass(Frame):
 
@@ -62,12 +59,12 @@ class CsvGuiClass(Frame):
         #  the name of the function that called iconClick
         if calledBy == "firstOptionClick":
             masterIn.after(25, icOn(self.first_handle))
-            masterIn.after(300, icOff1)
+            masterIn.after(100, icOff1)
             self.Operations(1)
 
         elif calledBy == "secondOptionClick":
             masterIn.after(25, icOn(self.second_handle))
-            masterIn.after(300, icOff2)
+            masterIn.after(100, icOff2)
             self.Operations(2)
 
         elif calledBy == "thirdOptionClick":
