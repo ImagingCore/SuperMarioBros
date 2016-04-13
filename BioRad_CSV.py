@@ -31,7 +31,6 @@ def getOutputFileName(inputfile):
         print outputfile
         return outputfile
 
-
 # -------------
 def writeShortCSV(inputfile,fnames_keep):
 
