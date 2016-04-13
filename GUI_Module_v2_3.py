@@ -6,12 +6,6 @@ import BioRad_CSV
 
 
 
-
-
-
-
-
-
 class CsvGuiClass(Frame):
 
     # Button labels. String literals. Sizes - all class constants
