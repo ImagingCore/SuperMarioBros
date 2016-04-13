@@ -7,8 +7,6 @@ import inspect
 
 
 
-
-
 class CsvGuiClass(Frame):
 
     # Button labels. String literals. Sizes - all class constants
@@ -19,7 +17,8 @@ class CsvGuiClass(Frame):
 
 
     # Opens file selection window. Calls OpeanAndRead from this class (to be altered)
-    def fileSelect(self,optionChoice):
+    def Operations(self, optionChoice):
+
 
         #  *************** file operations and other action calls to be implemented here ***************
         #
@@ -38,32 +37,44 @@ class CsvGuiClass(Frame):
         #  *********************************************************************************************
 
 
+
     def iconClick(self,masterIn):
 
         # get the name of the outside function calling iconClick
         calledBy = inspect.currentframe().f_back.f_code.co_name
 
-
-        def icOn():
-            self.third_handle.grid_forget()
-            self.start_handle.grid(row=1, columnspan=2, sticky=N)
-        def icOff():
+        def icOn(handle_name):
+                handle_name.grid_forget()
+                self.start_handle.grid(row=1, columnspan=2, sticky=N)
+        def icOff1():
+            self.start_handle.grid_forget()
+            self.first_handle.grid(row=1, columnspan=2, sticky=N)
+        def icOff2():
+            self.start_handle.grid_forget()
+            self.second_handle.grid(row=1, columnspan=2, sticky=N)
+        def icOff3():
             self.start_handle.grid_forget()
             self.third_handle.grid(row=1, columnspan=2, sticky=N)
 
-            # Check against which option is chosen by comparing against\
-            #  the name of the function that called iconClick
-            if calledBy == "firstOptionClick":
-                self.fileSelect(1)
-            elif calledBy == "secondOptionClick":
-                self.fileSelect(2)
-            elif calledBy == "thirdOptionClick":
-                self.fileSelect(3)
-            else:
-                print "ERROR: else condition inside iconClick"
+        # Check against which option is chosen by comparing against\
+        #  the name of the function that called iconClick
+        if calledBy == "firstOptionClick":
+            masterIn.after(25, icOn(self.first_handle))
+            masterIn.after(300, icOff1)
+            self.Operations(1)
 
-        masterIn.after(25, icOn)
-        masterIn.after(300, icOff)
+        elif calledBy == "secondOptionClick":
+            masterIn.after(25, icOn(self.second_handle))
+            masterIn.after(300, icOff2)
+            self.Operations(2)
+
+        elif calledBy == "thirdOptionClick":
+            masterIn.after(25, icOn(self.third_handle))
+            masterIn.after(300, icOff3)
+            self.Operations(3)
+        else:
+            print "ERROR: else condition inside iconClick"
+
 
     # Click option actuation functions
     def firstOptionClick(self, event):
@@ -247,8 +258,8 @@ def main():
     # Developer: remember to update these!
     global VERSION_DATE
     global VERSION_NUMBER
-    VERSION_DATE = "4/12/16"
-    VERSION_NUMBER = "2.4"
+    VERSION_DATE = "4/13/16"
+    VERSION_NUMBER = "2.5"
 
 
     # start main GUI window.
