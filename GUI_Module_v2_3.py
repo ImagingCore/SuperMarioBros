@@ -4,6 +4,7 @@ from os import path
 import csv
 import BioRad_CSV
 import inspect
+import time
 
 
 
@@ -60,17 +61,17 @@ class CsvGuiClass(Frame):
         #  the name of the function that called iconClick
         if calledBy == "firstOptionClick":
             masterIn.after(25, icOn(self.first_handle))
-            masterIn.after(300, icOff1)
+            masterIn.after(200, icOff1)
             self.Operations(1)
 
         elif calledBy == "secondOptionClick":
             masterIn.after(25, icOn(self.second_handle))
-            masterIn.after(300, icOff2)
+            masterIn.after(200, icOff2)
             self.Operations(2)
 
         elif calledBy == "thirdOptionClick":
             masterIn.after(25, icOn(self.third_handle))
-            masterIn.after(300, icOff3)
+            masterIn.after(200, icOff3)
             self.Operations(3)
         else:
             print "ERROR: else condition inside iconClick"
