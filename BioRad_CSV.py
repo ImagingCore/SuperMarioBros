@@ -55,7 +55,6 @@ def writeShortCSV(inputfile,fnames_keep):
 
 writeShortCSV(inputfile,fnames_keep)
 
-    
 # ------------------    
 def getUniqueValues(fullfilepath):  
         
