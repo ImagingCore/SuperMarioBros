@@ -12,8 +12,8 @@ class CsvGuiClass(Frame):
     MAIN_WIN_WIDTH = 380  # not in use
     MAIN_WIN_HEIGHT = 200  # not in use
     STATUS_LABEL1 = " -- Option1 -- [in development]"
-    STATUS_LABEL2 = " -- Option2 -- [in development]"
-    STATUS_LABEL3 = " >> BioRad file processing "
+    STATUS_LABEL2 = " >> Duplex file processing"
+    STATUS_LABEL3 = " >> Singleplex file processing "
 
     # Opens file selection window. Calls OpeanAndRead from this class (to be altered)
     def Operations(self, optionChoice):
@@ -100,6 +100,12 @@ class CsvGuiClass(Frame):
             self.FIRST_F = "./graphics/main_first_b.gif"
             self.SECOND_F = "./graphics/main_second_b.gif"
             self.THIRD_F = "./graphics/main_third_b.gif"
+        elif (versionIn == 3):
+            # Image files - GUI version 2
+            self.START_F = "./graphics/main_SandD_start.gif"
+            self.FIRST_F = "./graphics/main_SandD_first.gif"
+            self.SECOND_F = "./graphics/main_SandD_second.gif"
+            self.THIRD_F = "./graphics/main_SandD_third.gif"
         else:
             print "\n Choose the GUI version in CsvGuiClass!... Quitting program."
             exit()
@@ -143,8 +149,8 @@ class CsvGuiClass(Frame):
             # position reporter
             #print('{}, {}'.format(x, y))
 
-            if (18 <= x <= 112):
-                if (25 <= y <= 114):
+            if (5 <= x <= 172):
+                if (5 <= y <= 172):
                     #print "100<x<150 & 75<y<150"
                     self.start_handle.grid_forget()
                     self.second_handle.grid_forget()
@@ -158,8 +164,8 @@ class CsvGuiClass(Frame):
                     foo = None
                     #print "else condition"
 
-            elif (135 <= x <= 233):
-                if (20 <= y <= 118):
+            elif (174 <= x <= 342):
+                if (5 <= y <= 172):
                     self.start_handle.grid_forget()
                     self.first_handle.grid_forget()
                     self.third_handle.grid_forget()
@@ -172,8 +178,8 @@ class CsvGuiClass(Frame):
                     foo = None
                     #print "else condition"
 
-            elif (254 <= x <= 350):
-                if (20 <= y <= 120):
+            elif (360 <= x <= 523):
+                if (5 <= y <= 172):
                     self.start_handle.grid_forget()
                     self.second_handle.grid_forget()
                     self.third_handle.grid_forget()
@@ -203,7 +209,7 @@ class CsvGuiClass(Frame):
         self.stat_label_None = Label(masterIn,text=" ", fg='blue')
         self.stat_label_1 = Label(masterIn, text=self.STATUS_LABEL1, font=("Arial", 14, "italic"), fg='gray')
         self.stat_label_2 = Label(masterIn, text=self.STATUS_LABEL2, font=("Arial", 14, "italic"), fg='gray')
-        self.stat_label_3 = Label(masterIn, text=self.STATUS_LABEL3, font=("Arial", 14, "italic"), fg='blue')
+        self.stat_label_3 = Label(masterIn, text=self.STATUS_LABEL3, font=("Arial", 14, "italic"), fg='gray')
         # Exit button (bottom right
         self.button2 = Button(masterIn, text=self.EXIT_PROGRAM, font=("Arial", 16), command=self.quit)
         # Version label (top right)
@@ -257,8 +263,8 @@ def main():
     # Developer: remember to update these!
     global VERSION_DATE
     global VERSION_NUMBER
-    VERSION_DATE = "4/13/16"
-    VERSION_NUMBER = "2.5"
+    VERSION_DATE = "4/15/16"
+    VERSION_NUMBER = "2.6"
 
 
     # start main GUI window.
@@ -266,7 +272,7 @@ def main():
     # Developer: select GUI version (1 or 2)
     root = Tk()
     root.title("Snake Tools")
-    mainWindow = CsvGuiClass(master=root, version=2)
+    mainWindow = CsvGuiClass(master=root, version=3)
     mainWindow.mainloop()
 
 
