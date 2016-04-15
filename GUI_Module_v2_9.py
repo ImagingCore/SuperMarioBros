@@ -2,6 +2,7 @@ from Tkinter import *
 import tkFileDialog
 import BioRad_CSV
 import inspect
+import time
 
 
 class CsvGuiClass(Frame):
@@ -18,7 +19,7 @@ class CsvGuiClass(Frame):
 
 
 
-    def updateStatus(self,masterIn,statusIn):
+    def updateStatus(self,masterIn,statusIn, flashNum):
     # accepts a string value and displays a flash status at the bottom
 
         def writeStatus():
@@ -31,7 +32,7 @@ class CsvGuiClass(Frame):
         emptyStatus()
         last = 0
         DUR = 800
-        for k in range(3):
+        for k in range(flashNum):
             masterIn.after(last+DUR, writeStatus)
             last = last + DUR
             masterIn.after(last+DUR, emptyStatus)
@@ -53,6 +54,8 @@ class CsvGuiClass(Frame):
         elif optionChoice == 3:
             self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
             BioRad_CSV.pivotMe(self.filename)
+            self.updateStatus(self.master, "   Done!!!", 1)
+
         else:
             print "INTERNAL ERROR: else condition inside fileSelect"
         #
@@ -84,13 +87,13 @@ class CsvGuiClass(Frame):
         if calledBy == "firstOptionClick":
             masterIn.after(25, icOn(self.first_handle))
             masterIn.after(100, icOff1)
-            self.updateStatus(masterIn, "   Crunching...")
+            self.updateStatus(masterIn, "   Crunching...", 3)
             self.Operations(1)
 
         elif calledBy == "secondOptionClick":
             masterIn.after(25, icOn(self.second_handle))
             masterIn.after(100, icOff2)
-            self.updateStatus(masterIn, "   Processing...")
+            self.updateStatus(masterIn, "   Processing...", 3)
             self.Operations(2)
 
         elif calledBy == "thirdOptionClick":
@@ -173,13 +176,13 @@ class CsvGuiClass(Frame):
 
         # Info bar display functions called by motionMouse
         def infoNone():
-            self.stat_label_None.grid(row=2, column=0, sticky=W)
+            self.info_label_None.grid(row=2, column=0, sticky=W)
         def infoOne():
-            self.stat_label_1.grid(row=2, column=0, sticky=W)
+            self.info_label_1.grid(row=2, column=0, sticky=W)
         def infoTwo():
-            self.stat_label_2.grid(row=2, column=0, sticky=W)
+            self.info_label_2.grid(row=2, column=0, sticky=W)
         def infoThree():
-            self.stat_label_3.grid(row=2, column=0, sticky=W)
+            self.info_label_3.grid(row=2, column=0, sticky=W)
 
         # Mouse tracking functionality. Highlighting screen objects
         def motionMouse(event):
@@ -194,9 +197,9 @@ class CsvGuiClass(Frame):
                     self.second_handle.grid_forget()
                     self.third_handle.grid_forget()
                     showFirst()
-                    self.stat_label_None.grid_forget()
-                    self.stat_label_2.grid_forget()
-                    self.stat_label_3.grid_forget()
+                    self.info_label_None.grid_forget()
+                    self.info_label_2.grid_forget()
+                    self.info_label_3.grid_forget()
                     infoOne()
                 else:
                     foo = None
@@ -208,9 +211,9 @@ class CsvGuiClass(Frame):
                     self.first_handle.grid_forget()
                     self.third_handle.grid_forget()
                     showSecond()
-                    self.stat_label_None.grid_forget()
-                    self.stat_label_1.grid_forget()
-                    self.stat_label_3.grid_forget()
+                    self.info_label_None.grid_forget()
+                    self.info_label_1.grid_forget()
+                    self.info_label_3.grid_forget()
                     infoTwo()
                 else:
                     foo = None
@@ -222,9 +225,9 @@ class CsvGuiClass(Frame):
                     self.second_handle.grid_forget()
                     self.third_handle.grid_forget()
                     showThird()
-                    self.stat_label_None.grid_forget()
-                    self.stat_label_1.grid_forget()
-                    self.stat_label_2.grid_forget()
+                    self.info_label_None.grid_forget()
+                    self.info_label_1.grid_forget()
+                    self.info_label_2.grid_forget()
                     infoThree()
                 else:
                     foo = None
@@ -235,19 +238,19 @@ class CsvGuiClass(Frame):
                 self.second_handle.grid_forget()
                 self.third_handle.grid_forget()
                 showStart()
-                self.stat_label_1.grid_forget()
-                self.stat_label_2.grid_forget()
-                self.stat_label_3.grid_forget()
+                self.info_label_1.grid_forget()
+                self.info_label_2.grid_forget()
+                self.info_label_3.grid_forget()
                 infoNone()
 
         # To enable mouse tracking (i.e. root.bind('<Motion>', motionMouse))
         masterIn.bind('<Motion>', motionMouse)
 
         # Info labels (bottom left)
-        self.stat_label_None = Label(masterIn,text=" ", fg='blue')
-        self.stat_label_1 = Label(masterIn, text=self.INFO_LABEL1, font=("Arial", 14, "italic"), fg='gray')
-        self.stat_label_2 = Label(masterIn, text=self.INFO_LABEL2, font=("Arial", 14, "italic"), fg='black')
-        self.stat_label_3 = Label(masterIn, text=self.INFO_LABEL3, font=("Arial", 14, "italic"), fg='black')
+        self.info_label_None = Label(masterIn, text=" ", fg='blue')
+        self.info_label_1 = Label(masterIn, text=self.INFO_LABEL1, font=("Arial", 14, "italic"), fg='gray')
+        self.info_label_2 = Label(masterIn, text=self.INFO_LABEL2, font=("Arial", 14, "italic"), fg='black')
+        self.info_label_3 = Label(masterIn, text=self.INFO_LABEL3, font=("Arial", 14, "italic"), fg='black')
         # Exit button (bottom right
         self.button2 = Button(masterIn, text=self.EXIT_PROGRAM, font=("Arial", 16), command=self.quit)
         # Version label (top right)
@@ -257,7 +260,7 @@ class CsvGuiClass(Frame):
 
         # Construct the the main window interface for the first time
         showStart()
-        self.stat_label_None.grid(row=2, column=0, sticky=W)
+        self.info_label_None.grid(row=2, column=0, sticky=W)
         self.button2.grid(row=2, column=1, sticky=E)
         self.ver_label.grid(row=0,column=1, sticky=E)
         self.status_bar.grid(row=3, columnspan=2, sticky=W + E)

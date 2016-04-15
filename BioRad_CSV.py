@@ -3,6 +3,7 @@ import os
 import sys
 import csv
 import pandas as pd
+import time
 
 
 
@@ -139,9 +140,6 @@ def pivotMe(inputfile):
     else:
         writeShortCSV(inputfile, fnames_keep)
         addPivotTableToCSV(outputfile)
-
-
-
 
 
 
