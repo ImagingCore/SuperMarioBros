@@ -146,8 +146,6 @@ def addPivotTableToCSV(fullfilepath, GUI_input):
             print('Duplicate renamed to: ' + df.loc[dupl_indx, 'Sample'])
 
 
-
-
         # ----- pivot tables -----
         # find indexes of Channel 1 data and Channel 2 data
         ch1_indx = df[df['TargetType'] == 'Ch1Unknown'].index.tolist()
