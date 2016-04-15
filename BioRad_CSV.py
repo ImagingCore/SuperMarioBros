@@ -3,6 +3,7 @@ import os
 import sys
 import csv
 import pandas as pd
+import GUI_Module_v2_9
 
 
 
@@ -134,10 +135,15 @@ def pivotMe(inputfile):
     # Main operation calls.
 
     if outputfile == None:
-        foo = None
+        return 0  # this is needed to communicate the completion status of this process to the outside world
+                  # 0, process not complete, file not chosen...
+
     else:
         writeShortCSV(inputfile, fnames_keep)
         addPivotTableToCSV(outputfile)
+        return 1  # this is needed to communicate the completion status of this process to the outside world
+                  # 1 process is complete - Done!
+
 
 
 

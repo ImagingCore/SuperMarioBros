@@ -16,10 +16,9 @@ class CsvGuiClass(Frame):
     INFO_LABEL3 = "  Single channel BioRad "
 
 
-
-
-    def updateStatus(self,masterIn,statusIn, flashNum):
-    # accepts a string value and displays a flash status at the bottom
+    def updateStatus(self, masterIn, statusIn, flashNum, Dur):
+        # accepts a string value and displays a flash status at the bottom; accepts the number of flashes
+        #  accepts flash duration (ms)
 
         def writeStatus():
             self.status_bar = Label(masterIn, text=statusIn, font=("Arial", 13), fg='darkgreen', bd=1, relief=SUNKEN, anchor=W)
@@ -29,19 +28,18 @@ class CsvGuiClass(Frame):
             self.status_bar.grid(row=3, columnspan=2, sticky=W + E)
 
         emptyStatus()
+        writeStatus()
+
         last = 0
-        DUR = 800
         for k in range(flashNum):
-            masterIn.after(last+DUR, writeStatus)
-            last = last + DUR
-            masterIn.after(last+DUR, emptyStatus)
-            last = last + DUR
+            masterIn.after(last + Dur, writeStatus)
+            last = last + Dur
+            masterIn.after(last + Dur, emptyStatus)
+            last = last + Dur
 
 
-
-    # Opens file selection window. Calls OpeanAndRead from this class (to be altered)
     def Operations(self, optionChoice):
-
+        # File operations - calls to other modules to be implemented here
 
         #  *************** file operations and other action calls to be implemented here ***************
         #
@@ -52,8 +50,9 @@ class CsvGuiClass(Frame):
             foo = None
         elif optionChoice == 3:
             self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
-            BioRad_CSV.pivotMe(self.filename)
-            self.updateStatus(self.master, "   Done!!!", 1)
+            completion = BioRad_CSV.pivotMe(self.filename)
+            if completion == 1:
+                self.updateStatus(self.master, "   Done!!!", 1, 1500)
 
         else:
             print "INTERNAL ERROR: else condition inside fileSelect"
@@ -86,13 +85,13 @@ class CsvGuiClass(Frame):
         if calledBy == "firstOptionClick":
             masterIn.after(25, icOn(self.first_handle))
             masterIn.after(100, icOff1)
-            self.updateStatus(masterIn, "   Crunching...", 3)
+            self.updateStatus(masterIn, " >>  Crunching...", 3, 800)
             self.Operations(1)
 
         elif calledBy == "secondOptionClick":
             masterIn.after(25, icOn(self.second_handle))
             masterIn.after(100, icOff2)
-            self.updateStatus(masterIn, "   Processing...", 3)
+            self.updateStatus(masterIn, "  >> Processing...", 3, 800)
             self.Operations(2)
 
         elif calledBy == "thirdOptionClick":
@@ -248,8 +247,8 @@ class CsvGuiClass(Frame):
         # Info labels (bottom left)
         self.info_label_None = Label(masterIn, text=" ", fg='blue')
         self.info_label_1 = Label(masterIn, text=self.INFO_LABEL1, font=("Arial", 14, "italic"), fg='gray')
-        self.info_label_2 = Label(masterIn, text=self.INFO_LABEL2, font=("Arial", 14, "italic"), fg='black')
-        self.info_label_3 = Label(masterIn, text=self.INFO_LABEL3, font=("Arial", 14, "italic"), fg='black')
+        self.info_label_2 = Label(masterIn, text=self.INFO_LABEL2, font=("Arial", 14, "italic"), fg='gray')
+        self.info_label_3 = Label(masterIn, text=self.INFO_LABEL3, font=("Arial", 14, "italic"), fg='gray')
         # Exit button (bottom right
         self.button2 = Button(masterIn, text=self.EXIT_PROGRAM, font=("Arial", 16), command=self.quit)
         # Version label (top right)
