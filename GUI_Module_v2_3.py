@@ -2,6 +2,7 @@ from Tkinter import *
 import tkFileDialog
 import BioRad_CSV
 import inspect
+import time
 
 
 class CsvGuiClass(Frame):
@@ -11,9 +12,33 @@ class CsvGuiClass(Frame):
     EXIT_PROGRAM = "Exit!"
     MAIN_WIN_WIDTH = 380  # not in use
     MAIN_WIN_HEIGHT = 200  # not in use
-    STATUS_LABEL1 = " -- Option1 -- [in development]"
-    STATUS_LABEL2 = "  Dual channel BioRad file processing"
-    STATUS_LABEL3 = "  Single channel BioRad file processing "
+    INFO_LABEL1 = " -- Option1 -- [in development]"
+    INFO_LABEL2 = "  Dual channel BioRad file processing"
+    INFO_LABEL3 = "  Single channel BioRad file processing "
+
+
+
+
+    def updateStatus(self,masterIn,statusIn):
+    # accepts a string value and displays a flash status at the bottom
+
+        def writeStatus():
+            self.status_bar = Label(masterIn, text=statusIn, font=("Arial", 13), fg='darkgreen', bd=1, relief=SUNKEN, anchor=W)
+            self.status_bar.grid(row=3, columnspan=2, sticky=W + E)
+        def emptyStatus():
+            self.status_bar = Label(masterIn, text=" ", font=("Arial", 13), fg='darkgreen', bd=1, relief=SUNKEN, anchor=W)
+            self.status_bar.grid(row=3, columnspan=2, sticky=W + E)
+
+        emptyStatus()
+        last = 0
+        DUR = 800
+        for k in range(3):
+            masterIn.after(last+DUR, writeStatus)
+            last = last + DUR
+            masterIn.after(last+DUR, emptyStatus)
+            last = last + DUR
+
+
 
     # Opens file selection window. Calls OpeanAndRead from this class (to be altered)
     def Operations(self, optionChoice):
@@ -60,11 +85,13 @@ class CsvGuiClass(Frame):
         if calledBy == "firstOptionClick":
             masterIn.after(25, icOn(self.first_handle))
             masterIn.after(100, icOff1)
+            self.updateStatus(masterIn, "   Crunching...")
             self.Operations(1)
 
         elif calledBy == "secondOptionClick":
             masterIn.after(25, icOn(self.second_handle))
             masterIn.after(100, icOff2)
+            self.updateStatus(masterIn, "   Processing...")
             self.Operations(2)
 
         elif calledBy == "thirdOptionClick":
@@ -145,14 +172,14 @@ class CsvGuiClass(Frame):
             self.third_handle.grid(row=1,columnspan=2, sticky=N)
             self.third_handle.bind("<Button-1>", self.thirdOptionClick)
 
-        # Status bar display functions called by motionMouse
-        def statusNone():
+        # Info bar display functions called by motionMouse
+        def infoNone():
             self.stat_label_None.grid(row=2, column=0, sticky=W)
-        def statusOne():
+        def infoOne():
             self.stat_label_1.grid(row=2, column=0, sticky=W)
-        def statusTwo():
+        def infoTwo():
             self.stat_label_2.grid(row=2, column=0, sticky=W)
-        def statusThree():
+        def infoThree():
             self.stat_label_3.grid(row=2, column=0, sticky=W)
 
         # Mouse tracking functionality. Highlighting screen objects
@@ -171,7 +198,7 @@ class CsvGuiClass(Frame):
                     self.stat_label_None.grid_forget()
                     self.stat_label_2.grid_forget()
                     self.stat_label_3.grid_forget()
-                    statusOne()
+                    infoOne()
                 else:
                     foo = None
                     #print "else condition"
@@ -185,7 +212,7 @@ class CsvGuiClass(Frame):
                     self.stat_label_None.grid_forget()
                     self.stat_label_1.grid_forget()
                     self.stat_label_3.grid_forget()
-                    statusTwo()
+                    infoTwo()
                 else:
                     foo = None
                     #print "else condition"
@@ -199,7 +226,7 @@ class CsvGuiClass(Frame):
                     self.stat_label_None.grid_forget()
                     self.stat_label_1.grid_forget()
                     self.stat_label_2.grid_forget()
-                    statusThree()
+                    infoThree()
                 else:
                     foo = None
                     #print "else condition"
@@ -212,27 +239,29 @@ class CsvGuiClass(Frame):
                 self.stat_label_1.grid_forget()
                 self.stat_label_2.grid_forget()
                 self.stat_label_3.grid_forget()
-                statusNone()
+                infoNone()
 
         # To enable mouse tracking (i.e. root.bind('<Motion>', motionMouse))
         masterIn.bind('<Motion>', motionMouse)
 
-        # Status labels (bottom left)
+        # Info labels (bottom left)
         self.stat_label_None = Label(masterIn,text=" ", fg='blue')
-        self.stat_label_1 = Label(masterIn, text=self.STATUS_LABEL1, font=("Arial", 14, "italic"), fg='gray')
-        self.stat_label_2 = Label(masterIn, text=self.STATUS_LABEL2, font=("Arial", 14, "italic"), fg='black')
-        self.stat_label_3 = Label(masterIn, text=self.STATUS_LABEL3, font=("Arial", 14, "italic"), fg='black')
+        self.stat_label_1 = Label(masterIn, text=self.INFO_LABEL1, font=("Arial", 14, "italic"), fg='gray')
+        self.stat_label_2 = Label(masterIn, text=self.INFO_LABEL2, font=("Arial", 14, "italic"), fg='black')
+        self.stat_label_3 = Label(masterIn, text=self.INFO_LABEL3, font=("Arial", 14, "italic"), fg='black')
         # Exit button (bottom right
         self.button2 = Button(masterIn, text=self.EXIT_PROGRAM, font=("Arial", 16), command=self.quit)
         # Version label (top right)
         self.ver_label_str = "v " + VERSION_NUMBER + ", last updated on " + VERSION_DATE
         self.ver_label = Label(masterIn, text=self.ver_label_str, font=("Arial", 10, "italic"), fg='gray')
+        self.status_bar = Label(masterIn, text=" ", font=("Arial", 13), fg='gray', bd=1, relief=SUNKEN, anchor=W)
 
         # Construct the the main window interface for the first time
         showStart()
         self.stat_label_None.grid(row=2, column=0, sticky=W)
         self.button2.grid(row=2, column=1, sticky=E)
         self.ver_label.grid(row=0,column=1, sticky=E)
+        self.status_bar.grid(row=3, columnspan=2, sticky=W + E)
 
 
     # Class initialization
@@ -276,7 +305,7 @@ def main():
     global VERSION_DATE
     global VERSION_NUMBER
     VERSION_DATE = "4/15/16"
-    VERSION_NUMBER = "2.8"
+    VERSION_NUMBER = "2.9"
 
 
     # start main GUI window.
