@@ -12,8 +12,8 @@ class CsvGuiClass(Frame):
     MAIN_WIN_WIDTH = 380  # not in use
     MAIN_WIN_HEIGHT = 200  # not in use
     STATUS_LABEL1 = " -- Option1 -- [in development]"
-    STATUS_LABEL2 = " >> Dual channel BioRad file processing"
-    STATUS_LABEL3 = " >> Single channel BioRad file processing "
+    STATUS_LABEL2 = "  Dual channel BioRad file processing"
+    STATUS_LABEL3 = "  Single channel BioRad file processing "
 
     # Opens file selection window. Calls OpeanAndRead from this class (to be altered)
     def Operations(self, optionChoice):
@@ -220,8 +220,8 @@ class CsvGuiClass(Frame):
         # Status labels (bottom left)
         self.stat_label_None = Label(masterIn,text=" ", fg='blue')
         self.stat_label_1 = Label(masterIn, text=self.STATUS_LABEL1, font=("Arial", 14, "italic"), fg='gray')
-        self.stat_label_2 = Label(masterIn, text=self.STATUS_LABEL2, font=("Arial", 14, "italic"), fg='gray')
-        self.stat_label_3 = Label(masterIn, text=self.STATUS_LABEL3, font=("Arial", 14, "italic"), fg='gray')
+        self.stat_label_2 = Label(masterIn, text=self.STATUS_LABEL2, font=("Arial", 14, "italic"), fg='black')
+        self.stat_label_3 = Label(masterIn, text=self.STATUS_LABEL3, font=("Arial", 14, "italic"), fg='black')
         # Exit button (bottom right
         self.button2 = Button(masterIn, text=self.EXIT_PROGRAM, font=("Arial", 16), command=self.quit)
         # Version label (top right)
