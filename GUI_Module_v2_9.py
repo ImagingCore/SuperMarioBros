@@ -2,7 +2,6 @@ from Tkinter import *
 import tkFileDialog
 import BioRad_CSV
 import inspect
-import time
 
 
 class CsvGuiClass(Frame):
@@ -13,8 +12,8 @@ class CsvGuiClass(Frame):
     MAIN_WIN_WIDTH = 380  # not in use
     MAIN_WIN_HEIGHT = 200  # not in use
     INFO_LABEL1 = " -- Option1 -- [in development]"
-    INFO_LABEL2 = "  Dual channel BioRad file processing"
-    INFO_LABEL3 = "  Single channel BioRad file processing "
+    INFO_LABEL2 = "  Dual channel BioRad "
+    INFO_LABEL3 = "  Single channel BioRad "
 
 
 
