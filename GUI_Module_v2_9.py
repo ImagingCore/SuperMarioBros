@@ -2,11 +2,10 @@ from Tkinter import *
 import tkFileDialog
 import BioRad_CSV
 import inspect
-import time
+
 
 
 class CsvGuiClass(Frame):
-
     # Button labels. String literals. Sizes - all class constants
     SELECT_FILE = "Transform the .csv file"
     EXIT_PROGRAM = "Exit!"
