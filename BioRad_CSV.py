@@ -3,6 +3,7 @@ import os
 import sys
 import csv
 
+
 # comment the following line if using GUI
 #print "Enter full filepath of BioRad csv file"
 #inputfile = raw_input("> ")

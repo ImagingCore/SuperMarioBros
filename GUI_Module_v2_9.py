@@ -5,6 +5,7 @@ import inspect
 
 
 
+
 class CsvGuiClass(Frame):
     # Button labels. String literals. Sizes - all class constants
     SELECT_FILE = "Transform the .csv file"
