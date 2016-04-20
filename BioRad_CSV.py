@@ -7,14 +7,9 @@ import csv
 #print "Enter full filepath of BioRad csv file"
 #inputfile = raw_input("> ")
 
-#inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/LIVER 20160220 WTA SCALEUP PLATE 1 MK.csv'
-#GUI_input = 'singleplex'
-#modifiedFile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/LIVER 20160220 WTA SCALEUP PLATE 1 MK_MOD.csv'
-
 inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/MEL DDPCR PLATE 1 APRIL-1-2016-NoBlanks.csv'
 GUI_input = 'duplex'
 modifiedFile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/MEL DDPCR PLATE 1 APRIL-1-2016-NoBlanks_MOD.csv'
-#modifiedFile2 = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/MEL DDPCR PLATE 1 APRIL-1-2016_MOD2.csv'
 
 
 if GUI_input == 'singleplex':
@@ -88,7 +83,6 @@ def getUniqueValues(fullfilepath):
 
 
 
-
 # --------------------------
 import pandas as pd
 
@@ -158,35 +152,28 @@ def addPivotTableToCSV(fullfilepath, GUI_input):
         # create table 1 (ch1)
         pv_table1 = df.ix[ch1_indx].pivot(index='Sample', columns='Target', values='CopiesPer20uLWell')
         pv_table1 = pv_table1.reset_index() # reset index to numerical (0,1,2,3,...)
-        #pv_table1.rename(columns={'Sample': 'Sample_Ch1'})
-        #pv_table1.index.names = ['Sample_Ch1'] # rename index level
 
         # create table 2 (ch2)
         pv_table2 = df.ix[ch2_indx].pivot(index='Sample', columns='Target', values='CopiesPer20uLWell')
         pv_table2 = pv_table2.reset_index()  # reset index to numerical (0,1,2,3,...)
-        #pv_table2.rename(columns={'Sample':'Sample_Ch2'},inplace=True)
-        # pv_table2.index.names = ['Sample_Ch2'] # rename index level
-
 
         # Row concatenate tables
         # first renumber pv_table2 index...
-        x = len(pv_table1) + 2 # add an extra rows to separate the two tables
+        x = len(pv_table1) + 2 # add extra rows to separate the two tables
         pv_table2.index = range(x, len(pv_table2)+x)
 
+        # rename Sample column to Sample_Ch2
         header = pv_table1.columns.tolist()
         header[0] = 'Sample_Ch2'
-
         pv_table2.ix[x-1,:]=header
 
+        #concatenate Ch1 and Ch2 tables
         pv_table = pd.concat([pv_table1, pv_table2], axis=0)
-        pv_table.rename(columns={'Sample':'Sample_Ch1'})
+        pv_table.rename(columns={'Sample':'Sample_Ch1'}, inplace=True) #rename Sample column to Ch1
 
         # merge original csv with new pivot table
-
-
         merged_data = pd.concat([df, pv_table], axis=1, join_axes=[df.index])
         merged_data.to_csv(fullfilepath)
-
 
                   
 addPivotTableToCSV(modifiedFile,GUI_input)
