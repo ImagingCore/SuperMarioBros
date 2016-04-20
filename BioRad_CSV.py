@@ -1,49 +1,48 @@
-#!/usr/bin/env python 
 import os
 import sys
 import csv
 import pandas as pd
 
+def main(inputfile,GUI_input):
+
+    # comment the following line if using GUI
+    #print "Enter full filepath of BioRad csv file"
+    #inputfile = raw_input("> ")
 
 
-def pivotMe(inputfile):
-
-    # # comment the following line if using GUI
-    # print "Enter full filepath of BioRad csv file"
-    # inputfile = raw_input("> ")
-
-    # fieldnames to keep (MARK's samples)
-    fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
-
+    if GUI_input == 'singleplex':
+        # fieldnames to keep (Singleplex samples)
+        fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
+    elif GUI_input == 'duplex':
+        fnames_keep = ['Well', 'Sample', 'TargetType','Target', 'CopiesPer20uLWell']
 
     # ----------------
     def getOutputFileName(inputfile):
         # create output filename with same root and path as input file, adding the suffix _MOD
 
-
         # error checking
         if not os.path.isfile(inputfile):
-            foo = None
+            outputfile = None
+            return outputfile
             #print 'That is not a valid file!'
             #sys.exit(1) #gracefully exit Python
         else:
-            print 'File exists!'
+            #print 'File exists!'
             # parse fullefilepath
             path, filename = os.path.split(inputfile)
             root, ext = os.path.splitext(filename)
 
             # fullfilepath for outputfile
             outputfile = path + '/' + root +'_MOD.csv'
-            print outputfile
+            #print outputfile
             return outputfile
 
-
-    outputfile = getOutputFileName(inputfile)
     # -------------
+    outputfile = getOutputFileName(inputfile)
     def writeShortCSV(inputfile,fnames_keep):
 
-        #outputfile = getOutputFileName(inputfile)
-        print outputfile
+
+        #print outputfile
 
         with open(outputfile,'w') as csvoutfile: # open output file
             writer = csv.DictWriter(csvoutfile,fieldnames=fnames_keep,extrasaction='ignore')
@@ -59,7 +58,6 @@ def pivotMe(inputfile):
 
     #print('Modified CSV file saved as:  ' + outputfile)
     # ------------------
-
 
     # ------------------
     def getUniqueValues(fullfilepath):
@@ -82,12 +80,10 @@ def pivotMe(inputfile):
     #getUniqueValues(modifiedFile)
 
 
-
-
     # --------------------------
 
 
-    def addPivotTableToCSV(fullfilepath):
+    def addPivotTableToCSV(fullfilepath, GUI_input):
 
         df = pd.read_csv(fullfilepath) # load as a dataframe
 
@@ -99,45 +95,93 @@ def pivotMe(inputfile):
         #outputfile = path + '/' + root + '_MOD2.csv'
 
 
-        # find duplicates in data
-        dupl = df.duplicated(['Sample','Target'])
-        dupl_indx = dupl[(dupl == 1)].index.tolist()
+        if GUI_input == 'singleplex':
+            # find duplicates in data
+            dupl = df.duplicated(['Sample','Target'])
+            dupl_indx = dupl[(dupl == 1)].index.tolist()
 
-        #print('length of dupl_ind = ' + str(len(dupl_indx)))
+            # rename single duplicate, alert user if there is more than one duplicate
+            if len(dupl_indx) > 1:
+                print 'Multiple duplicates found in data!'
+                sys.exit(1)
+            elif (len(dupl_indx) == 1):
+                sampleName = df.loc[dupl_indx,'Sample']
+                df.loc[dupl_indx,'Sample'] = sampleName + '-' + str(2)
+                print('Duplicate renamed to: ' + df.loc[dupl_indx,'Sample'])
+
+            # pivot table
+            pv_table = df.pivot_table(index='Sample', columns='Target', values='CopiesPer20uLWell')
+
+            # merge original csv with new pivot table
+            # first need to reset index of pv_table...
+            pv_table = pv_table.reset_index()
+
+            merged_data = pd.concat([df, pv_table], axis=1, join_axes=[df.index])
+            merged_data.to_csv(fullfilepath)
+
+        elif GUI_input == 'duplex':
+            # find duplicates in data
+            dupl = df.duplicated(['Sample','TargetType','Target'])
+            dupl_indx = dupl[(dupl == 1)].index.tolist()
+
+            # rename single duplicate, alert user if there is more than one duplicate
+            if len(dupl_indx) > 1:
+                print 'Multiple duplicates found in data!'
+                print dupl
+                sys.exit(1)
+            elif (len(dupl_indx) == 1):
+                sampleName = df.loc[dupl_indx, 'Sample']
+                df.loc[dupl_indx, 'Sample'] = sampleName + '-' + str(2)
+                print('Duplicate renamed to: ' + df.loc[dupl_indx, 'Sample'])
 
 
-        # rename single duplicate, alert user if there is more than one duplicate
-        if len(dupl_indx) > 1:
-            print 'Multiple duplicates found in data!'
-            sys.exit(1)
+            # ----- pivot tables -----
+            # find indexes of Channel 1 data and Channel 2 data
+            ch1_indx = df[df['TargetType'] == 'Ch1Unknown'].index.tolist()
+            ch2_indx = df[df['TargetType'] == 'Ch2Unknown'].index.tolist()
 
-        elif (len(dupl_indx) == 1):
-            sampleName = df.loc[dupl_indx,'Sample']
-            df.loc[dupl_indx,'Sample'] = sampleName + '-' + str(2)
-            print('Duplicate renamed to: ' + df.loc[dupl_indx,'Sample'])
+            # OR...create multi-index
+            #dfx = df.set_index(['Sample','TargetType'])
 
 
-        # pivot table
-        pv_table = df.pivot_table(index='Sample', columns='Target', values='CopiesPer20uLWell')
-        #print pv_table
+            # create table 1 (ch1)
+            pv_table1 = df.ix[ch1_indx].pivot(index='Sample', columns='Target', values='CopiesPer20uLWell')
+            pv_table1 = pv_table1.reset_index() # reset index to numerical (0,1,2,3,...)
 
-        # merge original csv with new pivot table
-        # first need to reset index of pv_table...
-        pv_table = pv_table.reset_index()
-        #print pv_table
+            # create table 2 (ch2)
+            pv_table2 = df.ix[ch2_indx].pivot(index='Sample', columns='Target', values='CopiesPer20uLWell')
+            pv_table2 = pv_table2.reset_index()  # reset index to numerical (0,1,2,3,...)
 
-        merged_data = pd.concat([df,pv_table], axis=1, join_axes=[df.index])
+            # Row concatenate tables
+            # first renumber pv_table2 index...
+            x = len(pv_table1) + 2 # add extra rows to separate the two tables
+            pv_table2.index = range(x, len(pv_table2)+x)
 
-        merged_data.to_csv(fullfilepath)
+            # rename Sample column to Sample_Ch2
+            header = pv_table1.columns.tolist()
+            header[0] = 'Sample_Ch2'
+            pv_table2.ix[x-1,:]=header
+
+            #concatenate Ch1 and Ch2 tables
+            pv_table = pd.concat([pv_table1, pv_table2], axis=0)
+            pv_table.rename(columns={'Sample':'Sample_Ch1'}, inplace=True) #rename Sample column to Ch1
+
+            # merge original csv with new pivot table
+            merged_data = pd.concat([df, pv_table], axis=1, join_axes=[df.index])
+            merged_data.to_csv(fullfilepath)
 
 
-    # Main operation calls.
+
 
     if outputfile == None:
         foo = None
+        return 0  # this is needed to communicate the completion status of this process to the outside world
+        # 0, process not complete, file not chosen...
+
     else:
         writeShortCSV(inputfile, fnames_keep)
-        addPivotTableToCSV(outputfile)
+        addPivotTableToCSV(outputfile, GUI_input)
+        return 1 #  1 mean the process is complete, the external GUI is able to report "Done" status
 
 
 
@@ -145,24 +189,9 @@ def pivotMe(inputfile):
 
 
 
-    # def main():
-    #     if len(sys.argv) != 3:
-    #         print 'usage: ./BioRad_CSV.py {--liver | --TBD} file'
-    #         sys.exit(1)
-    #
-    #     option = sys.argv[1]
-    #     outputfilename = sys.argv[2]
-    #     filename = sys.argv[3]
-    #
-    #     babynames = extract_names(filename)
-    #
-    #     if option == '--summaryfile':
-    #         with open(outputfilename, 'w+') as f: #open file
-    #             f.write(str(babynames) + '\n')
-    #     else:
-    #         print babynames
-    #
-    #
-    #
-    # if __name__ == '__main__':
-#   main()
+
+
+
+
+
+
