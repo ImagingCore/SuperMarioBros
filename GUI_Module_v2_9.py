@@ -21,10 +21,10 @@ class CsvGuiClass(Frame):
         #  accepts flash duration (ms)
 
         def writeStatus():
-            self.status_bar = Label(masterIn, text=statusIn, font=("Arial", 13), fg='darkgreen', bd=1, relief=SUNKEN, anchor=W)
+            self.status_bar = Label(masterIn, text=statusIn, font=("Arial", 14), fg='darkgreen', bd=1, relief=SUNKEN, anchor=W)
             self.status_bar.grid(row=3, columnspan=2, sticky=W + E)
         def emptyStatus():
-            self.status_bar = Label(masterIn, text=" ", font=("Arial", 13), fg='darkgreen', bd=1, relief=SUNKEN, anchor=W)
+            self.status_bar = Label(masterIn, text=" ", font=("Arial", 14), fg='darkgreen', bd=1, relief=SUNKEN, anchor=W)
             self.status_bar.grid(row=3, columnspan=2, sticky=W + E)
 
         emptyStatus()
@@ -47,10 +47,13 @@ class CsvGuiClass(Frame):
         if optionChoice == 1:
             foo = None
         elif optionChoice == 2:
-            foo = None
+            self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
+            completion = BioRad_CSV.main(self.filename, 'duplex')
+            if completion == 1:
+                self.updateStatus(self.master, "   Done!!!", 1, 1500)
         elif optionChoice == 3:
             self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
-            completion = BioRad_CSV.pivotMe(self.filename)
+            completion = BioRad_CSV.main(self.filename,'singleplex')
             if completion == 1:
                 self.updateStatus(self.master, "   Done!!!", 1, 1500)
 
@@ -85,13 +88,11 @@ class CsvGuiClass(Frame):
         if calledBy == "firstOptionClick":
             masterIn.after(25, icOn(self.first_handle))
             masterIn.after(100, icOff1)
-            self.updateStatus(masterIn, " >>  Crunching...", 3, 800)
             self.Operations(1)
 
         elif calledBy == "secondOptionClick":
             masterIn.after(25, icOn(self.second_handle))
             masterIn.after(100, icOff2)
-            self.updateStatus(masterIn, "  >> Processing...", 3, 800)
             self.Operations(2)
 
         elif calledBy == "thirdOptionClick":
