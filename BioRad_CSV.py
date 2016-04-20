@@ -5,44 +5,85 @@ import pandas as pd
 
 def main(inputfile,GUI_input):
 
-    # comment the following line if using GUI
-    #print "Enter full filepath of BioRad csv file"
-    #inputfile = raw_input("> ")
+    # load as a dataframe
+    df = pd.read_csv(inputfile, index_col=False)
+
+    # parse fullfilepath
+    path, filename = os.path.split(inputfile)
+    root, ext = os.path.splitext(filename)
+
+    # fullfilepath for outputfile
+    # create output filename with same root and path as input file, adding the suffix _MOD
+    outputfile = path + '/' + root + '_MOD.csv'
+
+
+    # ----- Error Checking -----
+    # (1) check to see if columns of interest exist
+    if GUI_input == 'singleplex':
+        # fieldnames to keep (Singleplex samples)
+        fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
+        for fname in fnames_keep:
+            if fname not in df.columns:
+                print('Missing data columns!')
+                sys.exit(1)
+
+    elif GUI_input == 'duplex':
+        # fieldnames to keep (duplex samples)
+        fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
+        for fname in fnames_keep:
+            if fname not in df.columns:
+                print('Missing data columns!')
+                sys.exit(1)
+
+
+    # (2) find duplicates in data
+    dupl = df.duplicated(['Sample', 'TargetType', 'Target'])
+    dupl_indx = dupl[(dupl == 1)].index.tolist()
+
+    # rename single duplicate, alert user if there is more than one duplicate
+    if len(dupl_indx) > 1:
+        print 'Multiple duplicates found in data!'
+        sys.exit(1)
+    elif (len(dupl_indx) == 1):
+        #sampleName = df.loc[dupl_indx, 'Sample']
+        #df.loc[dupl_indx, 'Sample'] = sampleName + '-' + str(2)
+        print('Duplicate found for Sample ' + df.loc[dupl_indx,'Sample'].tolist()[0])
+        sys.exit(1)
+
+     # ----- End Error Checking -----
 
 
     if GUI_input == 'singleplex':
         # fieldnames to keep (Singleplex samples)
         fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
+
     elif GUI_input == 'duplex':
-        fnames_keep = ['Well', 'Sample', 'TargetType','Target', 'CopiesPer20uLWell']
+        # fieldnames to keep (duplex samples)
+        fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
 
     # ----------------
-    def getOutputFileName(inputfile):
-        # create output filename with same root and path as input file, adding the suffix _MOD
-
-        # error checking
-        if not os.path.isfile(inputfile):
-            outputfile = None
-            return outputfile
-            #print 'That is not a valid file!'
-            #sys.exit(1) #gracefully exit Python
-        else:
-            #print 'File exists!'
-            # parse fullefilepath
-            path, filename = os.path.split(inputfile)
-            root, ext = os.path.splitext(filename)
-
-            # fullfilepath for outputfile
-            outputfile = path + '/' + root +'_MOD.csv'
-            #print outputfile
-            return outputfile
+    # def getOutputFileName(inputfile):
+    #     # create output filename with same root and path as input file, adding the suffix _MOD
+    #
+    #     # error checking
+    #     if not os.path.isfile(inputfile):
+    #         outputfile = None
+    #         return outputfile
+    #         #print 'That is not a valid file!'
+    #         #sys.exit(1) #gracefully exit Python
+    #     else:
+    #         # parse fullefilepath
+    #         path, filename = os.path.split(inputfile)
+    #         root, ext = os.path.splitext(filename)
+    #
+    #         # fullfilepath for outputfile
+    #         outputfile = path + '/' + root +'_MOD.csv'
+    #         return outputfile
 
     # -------------
-    outputfile = getOutputFileName(inputfile)
+    #outputfile = getOutputFileName(inputfile)
+
     def writeShortCSV(inputfile,fnames_keep):
-
-
-        #print outputfile
 
         with open(outputfile,'w') as csvoutfile: # open output file
             writer = csv.DictWriter(csvoutfile,fieldnames=fnames_keep,extrasaction='ignore')
@@ -87,27 +128,20 @@ def main(inputfile,GUI_input):
 
         df = pd.read_csv(fullfilepath) # load as a dataframe
 
-        # get file parts for outputfile
-        #path, filename = os.path.split(fullfilepath)
-        #root, ext = os.path.splitext(filename)
-
-        # fullfilepath for outputfile
-        #outputfile = path + '/' + root + '_MOD2.csv'
-
 
         if GUI_input == 'singleplex':
             # find duplicates in data
-            dupl = df.duplicated(['Sample','Target'])
-            dupl_indx = dupl[(dupl == 1)].index.tolist()
-
-            # rename single duplicate, alert user if there is more than one duplicate
-            if len(dupl_indx) > 1:
-                print 'Multiple duplicates found in data!'
-                sys.exit(1)
-            elif (len(dupl_indx) == 1):
-                sampleName = df.loc[dupl_indx,'Sample']
-                df.loc[dupl_indx,'Sample'] = sampleName + '-' + str(2)
-                print('Duplicate renamed to: ' + df.loc[dupl_indx,'Sample'])
+            # dupl = df.duplicated(['Sample','Target'])
+            # dupl_indx = dupl[(dupl == 1)].index.tolist()
+            #
+            # # rename single duplicate, alert user if there is more than one duplicate
+            # if len(dupl_indx) > 1:
+            #     print 'Multiple duplicates found in data!'
+            #     sys.exit(1)
+            # elif (len(dupl_indx) == 1):
+            #     sampleName = df.loc[dupl_indx,'Sample']
+            #     df.loc[dupl_indx,'Sample'] = sampleName + '-' + str(2)
+            #     print('Duplicate renamed to: ' + df.loc[dupl_indx,'Sample'])
 
             # pivot table
             pv_table = df.pivot_table(index='Sample', columns='Target', values='CopiesPer20uLWell')
@@ -121,18 +155,18 @@ def main(inputfile,GUI_input):
 
         elif GUI_input == 'duplex':
             # find duplicates in data
-            dupl = df.duplicated(['Sample','TargetType','Target'])
-            dupl_indx = dupl[(dupl == 1)].index.tolist()
-
-            # rename single duplicate, alert user if there is more than one duplicate
-            if len(dupl_indx) > 1:
-                print 'Multiple duplicates found in data!'
-                print dupl
-                sys.exit(1)
-            elif (len(dupl_indx) == 1):
-                sampleName = df.loc[dupl_indx, 'Sample']
-                df.loc[dupl_indx, 'Sample'] = sampleName + '-' + str(2)
-                print('Duplicate renamed to: ' + df.loc[dupl_indx, 'Sample'])
+            # dupl = df.duplicated(['Sample','TargetType','Target'])
+            # dupl_indx = dupl[(dupl == 1)].index.tolist()
+            #
+            # # rename single duplicate, alert user if there is more than one duplicate
+            # if len(dupl_indx) > 1:
+            #     print 'Multiple duplicates found in data!'
+            #     print dupl
+            #     sys.exit(1)
+            # elif (len(dupl_indx) == 1):
+            #     sampleName = df.loc[dupl_indx, 'Sample']
+            #     df.loc[dupl_indx, 'Sample'] = sampleName + '-' + str(2)
+            #     print('Duplicate renamed to: ' + df.loc[dupl_indx, 'Sample'])
 
 
             # ----- pivot tables -----
