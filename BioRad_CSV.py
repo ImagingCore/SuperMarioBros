@@ -4,6 +4,9 @@ import csv
 import pandas as pd
 
 def main(inputfile,GUI_input):
+# main function accepts filename, and GUI input. Options: 'duplex' or 'singleplex'
+
+
 
     # load as a dataframe
     df = pd.read_csv(inputfile, index_col=False)
@@ -24,16 +27,22 @@ def main(inputfile,GUI_input):
         fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
         for fname in fnames_keep:
             if fname not in df.columns:
-                print('Missing data columns!')
-                sys.exit(1)
+                statusOut = ' Missing data columns! '
+                statusColor = 'red'
+                return statusOut, statusColor
+                # print('Missing data columns!')
+                #sys.exit(1)
 
     elif GUI_input == 'duplex':
         # fieldnames to keep (duplex samples)
         fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
         for fname in fnames_keep:
             if fname not in df.columns:
-                print('Missing data columns!')
-                sys.exit(1)
+                statusOut = ' Missing data columns!'
+                statusColor = 'red'
+                return statusOut, statusColor
+                # print('Missing data columns!')
+                #sys.exit(1)
 
 
     # (2) find duplicates in data
@@ -42,13 +51,21 @@ def main(inputfile,GUI_input):
 
     # rename single duplicate, alert user if there is more than one duplicate
     if len(dupl_indx) > 1:
-        print 'Multiple duplicates found in data!'
-        sys.exit(1)
+        statusOut = ' Multiple duplicates found in data! '
+        statusColor = 'red'
+        return statusOut, statusColor
+        # print 'Multiple duplicates found in data!'
+        #sys.exit(1)
     elif (len(dupl_indx) == 1):
-        #sampleName = df.loc[dupl_indx, 'Sample']
-        #df.loc[dupl_indx, 'Sample'] = sampleName + '-' + str(2)
-        print('Duplicate found for Sample ' + df.loc[dupl_indx,'Sample'].tolist()[0])
-        sys.exit(1)
+        sampleName = df.loc[dupl_indx, 'Sample']
+        df.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
+        #print('Duplicate found for Sample ' + df.loc[dupl_indx,'Sample'].tolist()[0])
+
+        statusOut = ' Duplicate found for Sample ' + df.loc[dupl_indx,'Sample'].tolist()[0]
+        statusColor = 'red'
+        return statusOut, statusColor
+        #sys.exit(1)
+
 
      # ----- End Error Checking -----
 
@@ -85,11 +102,11 @@ def main(inputfile,GUI_input):
 
     def writeShortCSV(inputfile,fnames_keep):
 
-        with open(outputfile,'w') as csvoutfile: # open output file
+        with open(outputfile, 'w') as csvoutfile: # open output file
             writer = csv.DictWriter(csvoutfile,fieldnames=fnames_keep,extrasaction='ignore')
             writer.writeheader()
 
-            with open(inputfile,'rU') as csvfile: # open input file
+            with open(inputfile, 'rU') as csvfile: # open input file
                 reader = csv.DictReader(csvfile) # read csv file
                 # creates dict of the form:  {key, value} = {Column_header, value}
 
@@ -103,7 +120,7 @@ def main(inputfile,GUI_input):
     # ------------------
     def getUniqueValues(fullfilepath):
 
-        with open(fullfilepath,'rU') as csvfile: # open input file
+        with open(fullfilepath, 'rU') as csvfile: # open input file
             reader = csv.DictReader(csvfile) # read csv file
             # create dict of the form:  {key, value} = {Column_header, value}
 
@@ -215,7 +232,10 @@ def main(inputfile,GUI_input):
     else:
         writeShortCSV(inputfile, fnames_keep)
         addPivotTableToCSV(outputfile, GUI_input)
-        return 1 #  1 mean the process is complete, the external GUI is able to report "Done" status
+        statusOut = ' Done!  Output file: ' + root + '_MOD.csv'
+        statusColor = 'darkgreen'
+        return statusOut, statusColor
+        # means the process is complete, the external GUI is able to report "Done" status writing in green color
 
 
 

@@ -4,7 +4,6 @@ import BioRad_CSV
 import inspect
 
 
-
 class CsvGuiClass(Frame):
     # Button labels. String literals. Sizes - all class constants
     SELECT_FILE = "Transform the .csv file"
@@ -16,15 +15,15 @@ class CsvGuiClass(Frame):
     INFO_LABEL3 = "  Single channel BioRad "
 
 
-    def updateStatus(self, masterIn, statusIn, flashNum, Dur):
+    def updateStatus(self, masterIn, statusIn, flashNum, Dur, color):
         # accepts a string value and displays a flash status at the bottom; accepts the number of flashes
-        #  accepts flash duration (ms)
+        #  accepts flash duration (ms), accepts color
 
         def writeStatus():
-            self.status_bar = Label(masterIn, text=statusIn, font=("Arial", 14), fg='darkgreen', bd=1, relief=SUNKEN, anchor=W)
+            self.status_bar = Label(masterIn, text=statusIn, font=("Arial", 14), fg=color, bd=1, relief=SUNKEN, anchor=W)
             self.status_bar.grid(row=3, columnspan=2, sticky=W + E)
         def emptyStatus():
-            self.status_bar = Label(masterIn, text=" ", font=("Arial", 14), fg='darkgreen', bd=1, relief=SUNKEN, anchor=W)
+            self.status_bar = Label(masterIn, text=" ", font=("Arial", 14), fg=color, bd=1, relief=SUNKEN, anchor=W)
             self.status_bar.grid(row=3, columnspan=2, sticky=W + E)
 
         emptyStatus()
@@ -46,19 +45,21 @@ class CsvGuiClass(Frame):
         #                                    FILE OPERATION CALLS
         if optionChoice == 1:
             foo = None
+
         elif optionChoice == 2:
             self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
-            completion = BioRad_CSV.main(self.filename, 'duplex')
-            if completion == 1:
-                self.updateStatus(self.master, "   Done!!!", 1, 1500)
+            if self.filename != "":
+                status_return, color = BioRad_CSV.main(self.filename, 'duplex')
+                self.updateStatus(self.master, status_return, 1, 5000, color)
+
         elif optionChoice == 3:
             self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
-            completion = BioRad_CSV.main(self.filename,'singleplex')
-            if completion == 1:
-                self.updateStatus(self.master, "   Done!!!", 1, 1500)
+            if self.filename != "":
+                status_return, color = BioRad_CSV.main(self.filename,'singleplex')
+                self.updateStatus(self.master, status_return, 1, 5000, color)
 
         else:
-            print "INTERNAL ERROR: else condition inside fileSelect"
+            print "INTERNAL ERROR: else condition inside Operations"
         #
         #
         #  *********************************************************************************************
@@ -275,38 +276,13 @@ class CsvGuiClass(Frame):
         self.createWidgets(master, version)
 
 
-
-# class FileOps():                # Class currently not implemented
-#
-#     # Accepts 1) path-file object, 2)the number of rows, 3) number of columns
-#     # Performs error checking against .csv extension
-#     # Reads the csv file row by row. Prints out results in a "matrix" form
-#     # No return
-#     def openAndRead(self, file, rows, col):
-#         # Error checking. Report an error if not a csv file
-#         fileExtention = str(path.basename(file))
-#         if (fileExtention[-3:] != "csv"):
-#             print "\n Pick a CSV file! \n"
-#
-#         else:
-#             with open(file, "r") as csvfile:
-#                 reader = csv.reader(csvfile, delimiter=',')
-#                 k = 0;
-#                 for row in reader:
-#                     while (k < rows):
-#                         print (row[0:col])
-#                         k = k + 1
-
-
-
-
 def main():
 
     # Developer: remember to update these!
     global VERSION_DATE
     global VERSION_NUMBER
-    VERSION_DATE = "4/15/16"
-    VERSION_NUMBER = "2.9"
+    VERSION_DATE = "4/22/16"
+    VERSION_NUMBER = "2.9.1"
 
 
     # start main GUI window.
