@@ -57,29 +57,29 @@ def main(inputfile,GUI_input):
     if len(dupl_indx) > 1:
         statusOut = ' Multiple duplicates found in data! '
         statusColor = 'red'
-        return statusOut, statusColor
+        #return statusOut, statusColor
         print 'Multiple duplicates found in data!'
         sys.exit(1)
     elif (len(dupl_indx) == 1):
         sampleName = df.loc[dupl_indx, 'Sample']
         df.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
-        df.to_csv(outputfile)
+        df.to_csv(outputfile, columns = fnames_keep)
+
         print('Renaming duplicate sample(s) to: ' + df.loc[dupl_indx,'Sample'].tolist()[0])
 
         statusOut = 'Renaming duplicate sample(s) to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
         statusColor = 'red'
-        print 'before return'
         #return statusOut, statusColor
     else:
         print 'No duplicates found'
-        df.to_csv(outputfile)
+        df.to_csv(outputfile, colunns = fnames_keep)
 
     print 'duplicates check'
         #sys.exit(1)
 
      # ----- End Error Checking -----
 
-    print fnames_keep
+
 
     def writeShortCSV(outputfile,fnames_keep):
 
@@ -209,7 +209,7 @@ def main(inputfile,GUI_input):
         # 0, process not complete, file not chosen...
 
     else:
-        writeShortCSV(outputfile, fnames_keep)
+        #writeShortCSV(outputfile, fnames_keep)
         addPivotTableToCSV(outputfile, GUI_input)
         statusOut = ' Done!  Output file: ' + root + '_MOD.csv'
         statusColor = 'darkgreen'
