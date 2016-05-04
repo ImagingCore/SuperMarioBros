@@ -3,9 +3,11 @@ import sys
 import csv
 import pandas as pd
 
+inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Prostate_test_noBlanks-SingleDup.csv'
+GUI_input = 'duplex'
+
 def main(inputfile,GUI_input):
 # main function accepts filename, and GUI input. Options: 'duplex' or 'singleplex'
-
 
 
     # load as a dataframe
@@ -19,6 +21,7 @@ def main(inputfile,GUI_input):
     # create output filename with same root and path as input file, adding the suffix _MOD
     outputfile = path + '/' + root + '_MOD.csv'
 
+    print outputfile
 
     # ----- Error Checking #1 -----
     # (1) check to see if columns of interest exist
@@ -29,9 +32,9 @@ def main(inputfile,GUI_input):
             if fname not in df.columns:
                 statusOut = ' Missing data columns! '
                 statusColor = 'red'
-                return statusOut, statusColor
-                # print('Missing data columns!')
-                #sys.exit(1)
+                #return statusOut, statusColor
+                print('Missing data columns!')
+                sys.exit(1)
 
     elif GUI_input == 'duplex':
         # fieldnames to keep (duplex samples)
@@ -40,9 +43,10 @@ def main(inputfile,GUI_input):
             if fname not in df.columns:
                 statusOut = ' Missing data columns!'
                 statusColor = 'red'
-                return statusOut, statusColor
-                # print('Missing data columns!')
-                #sys.exit(1)
+                #return statusOut, statusColor
+                print('Missing data columns!')
+                sys.exit(1)
+    print 'Input data is good'
 
 
     # (2) find duplicates in data
@@ -54,55 +58,30 @@ def main(inputfile,GUI_input):
         statusOut = ' Multiple duplicates found in data! '
         statusColor = 'red'
         return statusOut, statusColor
-        # print 'Multiple duplicates found in data!'
-        #sys.exit(1)
+        print 'Multiple duplicates found in data!'
+        sys.exit(1)
     elif (len(dupl_indx) == 1):
         sampleName = df.loc[dupl_indx, 'Sample']
         df.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
         df.to_csv(outputfile)
-        #print('Duplicate found for Sample ' + df.loc[dupl_indx,'Sample'].tolist()[0])
+        print('Renaming duplicate sample(s) to: ' + df.loc[dupl_indx,'Sample'].tolist()[0])
 
-        statusOut = 'Renaming duplicate sample to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
+        statusOut = 'Renaming duplicate sample(s) to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
         statusColor = 'red'
-        return statusOut, statusColor
+        print 'before return'
+        #return statusOut, statusColor
+    else:
+        print 'No duplicates found'
+        df.to_csv(outputfile)
 
+    print 'duplicates check'
         #sys.exit(1)
-
 
      # ----- End Error Checking -----
 
+    print fnames_keep
 
-    # if GUI_input == 'singleplex':
-    #     # fieldnames to keep (Singleplex samples)
-    #     fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
-    #
-    # elif GUI_input == 'duplex':
-    #     # fieldnames to keep (duplex samples)
-    #     fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
-
-    # ----------------
-    # def getOutputFileName(inputfile):
-    #     # create output filename with same root and path as input file, adding the suffix _MOD
-    #
-    #     # error checking
-    #     if not os.path.isfile(inputfile):
-    #         outputfile = None
-    #         return outputfile
-    #         #print 'That is not a valid file!'
-    #         #sys.exit(1) #gracefully exit Python
-    #     else:
-    #         # parse fullefilepath
-    #         path, filename = os.path.split(inputfile)
-    #         root, ext = os.path.splitext(filename)
-    #
-    #         # fullfilepath for outputfile
-    #         outputfile = path + '/' + root +'_MOD.csv'
-    #         return outputfile
-
-    # -------------
-    #outputfile = getOutputFileName(inputfile)
-
-    def writeShortCSV(inputfile,fnames_keep):
+    def writeShortCSV(outputfile,fnames_keep):
 
         with open(outputfile, 'w') as csvoutfile: # open output file
             writer = csv.DictWriter(csvoutfile,fieldnames=fnames_keep,extrasaction='ignore')
@@ -115,8 +94,6 @@ def main(inputfile,GUI_input):
                 for row in reader:   # iterate over rows, each row is a dict
                     writer.writerow(row)
 
-
-    #print('Modified CSV file saved as:  ' + outputfile)
     # ------------------
 
     # ------------------
@@ -232,7 +209,7 @@ def main(inputfile,GUI_input):
         # 0, process not complete, file not chosen...
 
     else:
-        writeShortCSV(inputfile, fnames_keep)
+        writeShortCSV(outputfile, fnames_keep)
         addPivotTableToCSV(outputfile, GUI_input)
         statusOut = ' Done!  Output file: ' + root + '_MOD.csv'
         statusColor = 'darkgreen'
@@ -240,6 +217,8 @@ def main(inputfile,GUI_input):
         # means the process is complete, the external GUI is able to report "Done" status writing in green color
 
 
+if __name__ == "__main__":
+    main(inputfile,GUI_input)
 
 
 
