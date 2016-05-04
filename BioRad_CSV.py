@@ -20,7 +20,7 @@ def main(inputfile,GUI_input):
     outputfile = path + '/' + root + '_MOD.csv'
 
 
-    # ----- Error Checking -----
+    # ----- Error Checking #1 -----
     # (1) check to see if columns of interest exist
     if GUI_input == 'singleplex':
         # fieldnames to keep (Singleplex samples)
@@ -59,24 +59,26 @@ def main(inputfile,GUI_input):
     elif (len(dupl_indx) == 1):
         sampleName = df.loc[dupl_indx, 'Sample']
         df.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
+        df.to_csv(outputfile)
         #print('Duplicate found for Sample ' + df.loc[dupl_indx,'Sample'].tolist()[0])
 
-        statusOut = ' Duplicate found for Sample ' + df.loc[dupl_indx,'Sample'].tolist()[0]
+        statusOut = 'Renaming duplicate sample to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
         statusColor = 'red'
         return statusOut, statusColor
+
         #sys.exit(1)
 
 
      # ----- End Error Checking -----
 
 
-    if GUI_input == 'singleplex':
-        # fieldnames to keep (Singleplex samples)
-        fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
-
-    elif GUI_input == 'duplex':
-        # fieldnames to keep (duplex samples)
-        fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
+    # if GUI_input == 'singleplex':
+    #     # fieldnames to keep (Singleplex samples)
+    #     fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
+    #
+    # elif GUI_input == 'duplex':
+    #     # fieldnames to keep (duplex samples)
+    #     fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
 
     # ----------------
     # def getOutputFileName(inputfile):
