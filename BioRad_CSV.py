@@ -51,11 +51,12 @@ def main(inputfile,GUI_input):
     # (2) find duplicates in data
     dupl = df.duplicated(['Sample', 'TargetType', 'Target']) # output: bool
 
-    dupl_df = df[dupl].sort(columns='Sample') #data frame of duplicates in alphabetical order by sample
-    dupl_indx = dupl[(dupl == 1)].index.tolist() # record index of duplicates
+    dupl_df = df[dupl].sort_values('Sample') #data frame of duplicates in alphabetical order by sample
+    dupl_indx = dupl_df.index.tolist()
+
+    #dupl_indx = dupl[(dupl == 1)].index.tolist() # record index of duplicates
 
     #dupl_samples = dupl_df['Sample'].unique().tolist().sort() # list of unique names of duplicated samples in alphabetical order
-
     #dupl_size = df.groupby(['Sample', 'TargetType', 'Target']).size()
 
     # rename duplicates
@@ -70,15 +71,23 @@ def main(inputfile,GUI_input):
         #dupl_df[dupl_df['Sample'] == 'H2O']
 
         # loop through unique (duplicated) sample names
-        count = 0
+        count = 2 # initialize counter
         for i in range(len(dupl_df)):
 
-            #if sample name is same as previous, append _count
-            if dupl_df.loc[dupl_indx[i+1],'Sample'] == dupl_df.loc[dupl_indx[i],'Sample']
-                ddf.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
-                count = ++
-            else count = 0
+            if i != 0:
+                #if sample name is same as previous, append _count
+                if dupl_df.loc[dupl_indx[i],'Sample'] == dupl_df.loc[dupl_indx[i-1],'Sample']:
+                    sampleName = df.loc[dupl_indx[i], 'Sample']
 
+                    df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
+                    print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+
+                    count = count + 1
+
+                else: count = 2
+            else:
+                sampleName = df.loc[dupl_indx[i], 'Sample']
+                df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
 
             #dupl_sample = dupl_size[dupl_size > 2].index.tolist() #find unique duplicated elements. index contains: sample, targettype, target
             #len(df[df['Sample'] == test[0][0]]) # [0][0] is the sample name of the first unique repeat
@@ -90,15 +99,15 @@ def main(inputfile,GUI_input):
               #  df[df['Sample']==dupl_sample[i][j]]
 
         #sys.exit(1)
-    elif len(dupl_size[dupl_size == 2]):  #(len(dupl_indx) == 1):
-        sampleName = df.loc[dupl_indx, 'Sample']
-        df.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
+    #elif len(dupl_size[dupl_size == 2]):  #(len(dupl_indx) == 1):
+     #   sampleName = df.loc[dupl_indx, 'Sample']
+      #  df.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
         df.to_csv(outputfile, columns = fnames_keep)
 
-        print('Renaming duplicate sample(s) to: ' + df.loc[dupl_indx,'Sample'].tolist()[0])
+        #print('Renaming duplicate sample(s) to: ' + df.loc[dupl_indx,'Sample'].tolist()[0])
 
-        statusOut = 'Renaming duplicate sample(s) to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
-        statusColor = 'red'
+        #statusOut = 'Renaming duplicate sample(s) to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
+        #statusColor = 'red'
         #return statusOut, statusColor
     else:
         print 'No duplicates found'
