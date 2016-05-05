@@ -89,7 +89,6 @@ def main(inputfile,GUI_input):
                 # rename all samples with same name
               #  df[df['Sample']==dupl_sample[i][j]]
 
-
         #sys.exit(1)
     elif len(dupl_size[dupl_size == 2]):  #(len(dupl_indx) == 1):
         sampleName = df.loc[dupl_indx, 'Sample']
