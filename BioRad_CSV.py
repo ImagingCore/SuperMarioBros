@@ -3,7 +3,7 @@ import sys
 import csv
 import pandas as pd
 
-inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Prostate_test_noBlanks-SingleDup.csv'
+inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Prostate_test_noBlanks-SingleMultipleDup.csv'
 GUI_input = 'duplex'
 
 def main(inputfile,GUI_input):
@@ -26,7 +26,7 @@ def main(inputfile,GUI_input):
     # ----- Error Checking #1 -----
     # (1) check to see if columns of interest exist
     if GUI_input == 'singleplex':
-        # fieldnames to keep (Singleplex samples)
+        # fieldnames to keep (singleplex samples)
         fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
         for fname in fnames_keep:
             if fname not in df.columns:
@@ -48,19 +48,50 @@ def main(inputfile,GUI_input):
                 sys.exit(1)
     print 'Input data is good'
 
-
     # (2) find duplicates in data
-    dupl = df.duplicated(['Sample', 'TargetType', 'Target'])
-    dupl_indx = dupl[(dupl == 1)].index.tolist()
+    dupl = df.duplicated(['Sample', 'TargetType', 'Target']) # output: bool
 
-    # rename single duplicate, alert user if there is more than one duplicate
-    if len(dupl_indx) > 1:
-        statusOut = ' Multiple duplicates found in data! '
-        statusColor = 'red'
+    dupl_df = df[dupl].sort(columns='Sample') #data frame of duplicates in alphabetical order by sample
+    dupl_indx = dupl[(dupl == 1)].index.tolist() # record index of duplicates
+
+    #dupl_samples = dupl_df['Sample'].unique().tolist().sort() # list of unique names of duplicated samples in alphabetical order
+
+    #dupl_size = df.groupby(['Sample', 'TargetType', 'Target']).size()
+
+    # rename duplicates
+    if len(dupl_indx) >= 2:
+        #statusOut = ' Multiple duplicates found in data! '
+        #statusColor = 'red'
         #return statusOut, statusColor
-        print 'Multiple duplicates found in data!'
-        sys.exit(1)
-    elif (len(dupl_indx) == 1):
+        print 'Duplicates found in data!'
+
+        #sampleName = df.loc[dupl_indx,'Sample']
+        #dupl_df = df.loc[dupl_indx,'Sample'].to_frame()
+        #dupl_df[dupl_df['Sample'] == 'H2O']
+
+        # loop through unique (duplicated) sample names
+        count = 0
+        for i in range(len(dupl_df)):
+
+            #if sample name is same as previous, append _count
+            if dupl_df.loc[dupl_indx[i+1],'Sample'] == dupl_df.loc[dupl_indx[i],'Sample']
+                ddf.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
+                count = ++
+            else count = 0
+
+
+            #dupl_sample = dupl_size[dupl_size > 2].index.tolist() #find unique duplicated elements. index contains: sample, targettype, target
+            #len(df[df['Sample'] == test[0][0]]) # [0][0] is the sample name of the first unique repeat
+
+            # Loop through all repeats for a given sample name
+            #for j in range(len(dupl_sample)):
+
+                # rename all samples with same name
+              #  df[df['Sample']==dupl_sample[i][j]]
+
+
+        #sys.exit(1)
+    elif len(dupl_size[dupl_size == 2]):  #(len(dupl_indx) == 1):
         sampleName = df.loc[dupl_indx, 'Sample']
         df.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
         df.to_csv(outputfile, columns = fnames_keep)
@@ -80,7 +111,7 @@ def main(inputfile,GUI_input):
      # ----- End Error Checking -----
 
 
-
+# DON'T NEED THIS METHOD:
     def writeShortCSV(outputfile,fnames_keep):
 
         with open(outputfile, 'w') as csvoutfile: # open output file
