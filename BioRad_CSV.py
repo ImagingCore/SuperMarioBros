@@ -54,10 +54,6 @@ def main(inputfile,GUI_input):
     dupl_df = df[dupl].sort_values('Sample') #data frame of duplicates in alphabetical order by sample
     dupl_indx = dupl_df.index.tolist()
 
-    #dupl_indx = dupl[(dupl == 1)].index.tolist() # record index of duplicates
-
-    #dupl_samples = dupl_df['Sample'].unique().tolist().sort() # list of unique names of duplicated samples in alphabetical order
-    #dupl_size = df.groupby(['Sample', 'TargetType', 'Target']).size()
 
     # rename duplicates
     if len(dupl_indx) >= 2:
@@ -65,10 +61,6 @@ def main(inputfile,GUI_input):
         #statusColor = 'red'
         #return statusOut, statusColor
         print 'Duplicates found in data!'
-
-        #sampleName = df.loc[dupl_indx,'Sample']
-        #dupl_df = df.loc[dupl_indx,'Sample'].to_frame()
-        #dupl_df[dupl_df['Sample'] == 'H2O']
 
         # loop through unique (duplicated) sample names
         count = 2 # initialize counter
@@ -86,27 +78,15 @@ def main(inputfile,GUI_input):
 
                 else:
                     df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
+                    print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
                     count = count + 1
 
             else:
                 df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
+                print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
 
-            #dupl_sample = dupl_size[dupl_size > 2].index.tolist() #find unique duplicated elements. index contains: sample, targettype, target
-            #len(df[df['Sample'] == test[0][0]]) # [0][0] is the sample name of the first unique repeat
 
-            # Loop through all repeats for a given sample name
-            #for j in range(len(dupl_sample)):
-
-                # rename all samples with same name
-              #  df[df['Sample']==dupl_sample[i][j]]
-
-        #sys.exit(1)
-    #elif len(dupl_size[dupl_size == 2]):  #(len(dupl_indx) == 1):
-     #   sampleName = df.loc[dupl_indx, 'Sample']
-      #  df.loc[dupl_indx, 'Sample'] = sampleName + '_' + str(2)
         df.to_csv(outputfile, columns = fnames_keep)
-
-        #print('Renaming duplicate sample(s) to: ' + df.loc[dupl_indx,'Sample'].tolist()[0])
 
         #statusOut = 'Renaming duplicate sample(s) to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
         #statusColor = 'red'
@@ -115,7 +95,6 @@ def main(inputfile,GUI_input):
         print 'No duplicates found'
         df.to_csv(outputfile, colunns = fnames_keep)
 
-    print 'duplicates check'
         #sys.exit(1)
 
      # ----- End Error Checking -----
