@@ -4,9 +4,10 @@ import csv
 import pandas as pd
 
 inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Prostate_test_noBlanks-SingleMultipleDup.csv'
+outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Prostate_test_noBlanks-SingleMultipleDup_MOD.csv'
 GUI_input = 'duplex'
 
-def main(inputfile,GUI_input):
+def main(inputfile,GUI_input,outputfile):
 # main function accepts filename, and GUI input. Options: 'duplex' or 'singleplex'
 
 
@@ -143,21 +144,9 @@ def main(inputfile,GUI_input):
     def addPivotTableToCSV(fullfilepath, GUI_input):
 
         df = pd.read_csv(fullfilepath) # load as a dataframe
-
+        print 'hello'
 
         if GUI_input == 'singleplex':
-            # find duplicates in data
-            # dupl = df.duplicated(['Sample','Target'])
-            # dupl_indx = dupl[(dupl == 1)].index.tolist()
-            #
-            # # rename single duplicate, alert user if there is more than one duplicate
-            # if len(dupl_indx) > 1:
-            #     print 'Multiple duplicates found in data!'
-            #     sys.exit(1)
-            # elif (len(dupl_indx) == 1):
-            #     sampleName = df.loc[dupl_indx,'Sample']
-            #     df.loc[dupl_indx,'Sample'] = sampleName + '-' + str(2)
-            #     print('Duplicate renamed to: ' + df.loc[dupl_indx,'Sample'])
 
             # pivot table
             pv_table = df.pivot_table(index='Sample', columns='Target', values='CopiesPer20uLWell')
@@ -170,19 +159,7 @@ def main(inputfile,GUI_input):
             merged_data.to_csv(fullfilepath)
 
         elif GUI_input == 'duplex':
-            # find duplicates in data
-            # dupl = df.duplicated(['Sample','TargetType','Target'])
-            # dupl_indx = dupl[(dupl == 1)].index.tolist()
-            #
-            # # rename single duplicate, alert user if there is more than one duplicate
-            # if len(dupl_indx) > 1:
-            #     print 'Multiple duplicates found in data!'
-            #     print dupl
-            #     sys.exit(1)
-            # elif (len(dupl_indx) == 1):
-            #     sampleName = df.loc[dupl_indx, 'Sample']
-            #     df.loc[dupl_indx, 'Sample'] = sampleName + '-' + str(2)
-            #     print('Duplicate renamed to: ' + df.loc[dupl_indx, 'Sample'])
+            print 'duplex'
 
 
             # ----- pivot tables -----
@@ -221,8 +198,6 @@ def main(inputfile,GUI_input):
             merged_data.to_csv(fullfilepath)
 
 
-
-
     if outputfile == None:
         foo = None
         return 0  # this is needed to communicate the completion status of this process to the outside world
@@ -238,7 +213,7 @@ def main(inputfile,GUI_input):
 
 
 if __name__ == "__main__":
-    main(inputfile,GUI_input)
+    main(inputfile,GUI_input,outputfile)
 
 
 
