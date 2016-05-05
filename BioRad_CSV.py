@@ -73,20 +73,22 @@ def main(inputfile,GUI_input):
         # loop through unique (duplicated) sample names
         count = 2 # initialize counter
         for i in range(len(dupl_df)):
+            sampleName = df.loc[dupl_indx[i], 'Sample']
 
             if i != 0:
                 #if sample name is same as previous, append _count
                 if dupl_df.loc[dupl_indx[i],'Sample'] == dupl_df.loc[dupl_indx[i-1],'Sample']:
-                    sampleName = df.loc[dupl_indx[i], 'Sample']
 
                     df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
                     print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
 
                     count = count + 1
 
-                else: count = 2
+                else:
+                    df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
+                    count = count + 1
+
             else:
-                sampleName = df.loc[dupl_indx[i], 'Sample']
                 df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
 
             #dupl_sample = dupl_size[dupl_size > 2].index.tolist() #find unique duplicated elements. index contains: sample, targettype, target
