@@ -3,13 +3,13 @@ import sys
 import csv
 import pandas as pd
 
-inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Prostate_test_noBlanks-SingleMultipleDup.csv'
-outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Prostate_test_noBlanks-SingleMultipleDup_MOD.csv'
+inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/PROSTATE 3-25-16 EE_FFPE#1 T-E&ARV7_GAPDH.csv'
+outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/PROSTATE 3-25-16 EE_FFPE#1 T-E&ARV7_GAPDH_MOD.csv'
+
 GUI_input = 'duplex'
 
 def main(inputfile,GUI_input,outputfile):
 # main function accepts filename, and GUI input. Options: 'duplex' or 'singleplex'
-
 
     # load as a dataframe
     df = pd.read_csv(inputfile, index_col=False)
@@ -21,8 +21,6 @@ def main(inputfile,GUI_input,outputfile):
     # fullfilepath for outputfile
     # create output filename with same root and path as input file, adding the suffix _MOD
     outputfile = path + '/' + root + '_MOD.csv'
-
-    print outputfile
 
     # ----- Error Checking #1 -----
     # (1) check to see if columns of interest exist
@@ -57,7 +55,7 @@ def main(inputfile,GUI_input,outputfile):
 
 
     # rename duplicates
-    if len(dupl_indx) >= 2:
+    if len(dupl_indx) >= 1:
         #statusOut = ' Multiple duplicates found in data! '
         #statusColor = 'red'
         #return statusOut, statusColor
@@ -144,6 +142,7 @@ def main(inputfile,GUI_input,outputfile):
     def addPivotTableToCSV(fullfilepath, GUI_input):
 
         df = pd.read_csv(fullfilepath) # load as a dataframe
+        #df = pd.read_csv(outputfile)
 
         if GUI_input == 'singleplex':
 
@@ -169,32 +168,35 @@ def main(inputfile,GUI_input,outputfile):
 
             # create table 1 (ch1)
             pv_table1 = df.ix[ch1_indx].pivot(index='Sample', columns='Target', values='CopiesPer20uLWell')
-            pv_table1 = pv_table1.reset_index() # reset index to numerical (0,1,2,3,...)
+            pv_table1 = pv_table1.reset_index() # reset index to numeric (0,1,2,3,...)
 
             # create table 2 (ch2)
             pv_table2 = df.ix[ch2_indx].pivot(index='Sample', columns='Target', values='CopiesPer20uLWell')
-            pv_table2 = pv_table2.reset_index()  # reset index to numerical (0,1,2,3,...)
+            pv_table2 = pv_table2.reset_index()  # reset index to numeric (0,1,2,3,...)
 
             # Row concatenate tables
             # first renumber pv_table2 index...
             x = len(pv_table1) + 2 # add extra rows to separate the two tables
             pv_table2.index = range(x, len(pv_table2)+x)
 
-            # get column headings for table 2 (ch2)
-            #pv_table2_header = pv_table2.columns.tolist()
+            # get column headings for table 2
+            pv_table2_header = pv_table2.columns.tolist()
 
             # rename Sample column to Sample_Ch2
             pv_table2_header[0] = 'Sample_Ch2'
             pv_table2.ix[x - 1, :] = pv_table2_header
 
             # concatenate Ch1 and Ch2 tables
-            pv_table = pd.concat([pv_table1, pv_table2], axis=0)
-            pv_table.to_csv('/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Prostate_test_noBlanks-SingleMultipleDup_TMP.csv')
-
-            # concatenate column header for all
-            header = df.columns.tolist() + pv_table1_header + pv_table2_header[1:]
+            pv_table = pd.concat([pv_table1, pv_table2], axis=0).sort_index()
 
             pv_table.rename(columns={'Sample': 'Sample_Ch1'}, inplace=True)  # rename Sample column to Ch1
+            pv_table.to_csv('/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST.csv', index=True)
+
+            # concatenate column header for all
+            # get column headings for table 2
+            pv_table1.rename(columns={'Sample': 'Sample_Ch1'}, inplace=True)  # rename Sample column to Ch1
+            header = df.columns.tolist() + pv_table1.columns.tolist() + pv_table2_header[1:]
+            print header
 
             # merge original csv with new pivot table
             merged_data = pd.concat([df, pv_table], axis=1, join_axes=[df.index])
@@ -209,6 +211,7 @@ def main(inputfile,GUI_input,outputfile):
 
     else:
         #writeShortCSV(outputfile, fnames_keep)
+        #print 'test'
         addPivotTableToCSV(outputfile, GUI_input)
         #statusOut = ' Done!  Output file: ' + root + '_MOD.csv'
         #statusColor = 'darkgreen'
