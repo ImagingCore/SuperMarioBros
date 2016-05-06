@@ -87,14 +87,14 @@ def main(inputfile,GUI_input,outputfile):
                 print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
 
 
-        df.to_csv(outputfile, columns = fnames_keep)
+        df.to_csv(outputfile, columns = fnames_keep, index=False)
 
         #statusOut = 'Renaming duplicate sample(s) to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
         #statusColor = 'red'
         #return statusOut, statusColor
     else:
         print 'No duplicates found'
-        df.to_csv(outputfile, colunns = fnames_keep)
+        df.to_csv(outputfile, colunns = fnames_keep, index=False)
 
         #sys.exit(1)
 
@@ -144,7 +144,6 @@ def main(inputfile,GUI_input,outputfile):
     def addPivotTableToCSV(fullfilepath, GUI_input):
 
         df = pd.read_csv(fullfilepath) # load as a dataframe
-        print 'hello'
 
         if GUI_input == 'singleplex':
 
@@ -156,11 +155,9 @@ def main(inputfile,GUI_input,outputfile):
             pv_table = pv_table.reset_index()
 
             merged_data = pd.concat([df, pv_table], axis=1, join_axes=[df.index])
-            merged_data.to_csv(fullfilepath)
+            merged_data.to_csv(fullfilepath, index=False)
 
         elif GUI_input == 'duplex':
-            print 'duplex'
-
 
             # ----- pivot tables -----
             # find indexes of Channel 1 data and Channel 2 data
@@ -168,8 +165,7 @@ def main(inputfile,GUI_input,outputfile):
             ch2_indx = df[df['TargetType'] == 'Ch2Unknown'].index.tolist()
 
             # OR...create multi-index
-            #dfx = df.set_index(['Sample','TargetType'])
-
+            #dfx = df.set_index(['TargetType','Sample])
 
             # create table 1 (ch1)
             pv_table1 = df.ix[ch1_indx].pivot(index='Sample', columns='Target', values='CopiesPer20uLWell')
@@ -184,18 +180,26 @@ def main(inputfile,GUI_input,outputfile):
             x = len(pv_table1) + 2 # add extra rows to separate the two tables
             pv_table2.index = range(x, len(pv_table2)+x)
 
-            # rename Sample column to Sample_Ch2
-            header = pv_table1.columns.tolist()
-            header[0] = 'Sample_Ch2'
-            pv_table2.ix[x-1,:]=header
+            # get column headings for table 2 (ch2)
+            #pv_table2_header = pv_table2.columns.tolist()
 
-            #concatenate Ch1 and Ch2 tables
+            # rename Sample column to Sample_Ch2
+            pv_table2_header[0] = 'Sample_Ch2'
+            pv_table2.ix[x - 1, :] = pv_table2_header
+
+            # concatenate Ch1 and Ch2 tables
             pv_table = pd.concat([pv_table1, pv_table2], axis=0)
-            pv_table.rename(columns={'Sample':'Sample_Ch1'}, inplace=True) #rename Sample column to Ch1
+            pv_table.to_csv('/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Prostate_test_noBlanks-SingleMultipleDup_TMP.csv')
+
+            # concatenate column header for all
+            header = df.columns.tolist() + pv_table1_header + pv_table2_header[1:]
+
+            pv_table.rename(columns={'Sample': 'Sample_Ch1'}, inplace=True)  # rename Sample column to Ch1
 
             # merge original csv with new pivot table
             merged_data = pd.concat([df, pv_table], axis=1, join_axes=[df.index])
-            merged_data.to_csv(fullfilepath)
+            merged_data = merged_data.ix[:,header] #re-order columns
+            merged_data.to_csv(fullfilepath, index=False)
 
 
     if outputfile == None:
@@ -206,9 +210,9 @@ def main(inputfile,GUI_input,outputfile):
     else:
         #writeShortCSV(outputfile, fnames_keep)
         addPivotTableToCSV(outputfile, GUI_input)
-        statusOut = ' Done!  Output file: ' + root + '_MOD.csv'
-        statusColor = 'darkgreen'
-        return statusOut, statusColor
+        #statusOut = ' Done!  Output file: ' + root + '_MOD.csv'
+        #statusColor = 'darkgreen'
+        #return statusOut, statusColor
         # means the process is complete, the external GUI is able to report "Done" status writing in green color
 
 
