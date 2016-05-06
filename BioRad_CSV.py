@@ -3,10 +3,10 @@ import sys
 import csv
 import pandas as pd
 
-inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/PROSTATE 3-25-16 EE_FFPE#1 T-E&ARV7_GAPDH.csv'
-outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/PROSTATE 3-25-16 EE_FFPE#1 T-E&ARV7_GAPDH_MOD.csv'
+inputfile = '/Volumes/ctc2-raw4/DropletData/2016-05(May)/GU/Patients/PROSTATE 5-3-16 EE_ HDs TE&ARV7_MM_NoBlanks.csv'
+outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST_MOD.csv'
 
-GUI_input = 'duplex'
+GUI_input = 'singleplex'
 
 def main(inputfile,GUI_input,outputfile):
 # main function accepts filename, and GUI input. Options: 'duplex' or 'singleplex'
@@ -64,6 +64,7 @@ def main(inputfile,GUI_input,outputfile):
         # loop through unique (duplicated) sample names
         count = 2 # initialize counter
         for i in range(len(dupl_df)):
+            #print ('range = ' + str(len(dupl_df)))
             sampleName = df.loc[dupl_indx[i], 'Sample']
 
             if i != 0:
@@ -76,6 +77,8 @@ def main(inputfile,GUI_input,outputfile):
                     count = count + 1
 
                 else:
+                    #print('i = ' + str(i))
+                    #print ('count = '+ str(count))
                     df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
                     print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
                     count = count + 1
@@ -98,46 +101,7 @@ def main(inputfile,GUI_input,outputfile):
 
      # ----- End Error Checking -----
 
-
-# DON'T NEED THIS METHOD:
-    def writeShortCSV(outputfile,fnames_keep):
-
-        with open(outputfile, 'w') as csvoutfile: # open output file
-            writer = csv.DictWriter(csvoutfile,fieldnames=fnames_keep,extrasaction='ignore')
-            writer.writeheader()
-
-            with open(inputfile, 'rU') as csvfile: # open input file
-                reader = csv.DictReader(csvfile) # read csv file
-                # creates dict of the form:  {key, value} = {Column_header, value}
-
-                for row in reader:   # iterate over rows, each row is a dict
-                    writer.writerow(row)
-
     # ------------------
-
-    # ------------------
-    def getUniqueValues(fullfilepath):
-
-        with open(fullfilepath, 'rU') as csvfile: # open input file
-            reader = csv.DictReader(csvfile) # read csv file
-            # create dict of the form:  {key, value} = {Column_header, value}
-
-            unique_targets = set() # only contains unique items
-            unique_samples = set()
-
-            for row in reader:   # iterate over rows, each row is a dict
-
-                unique_targets.add(row['Target'])
-                unique_samples.add(row['Sample'])
-
-        return unique_samples, unique_targets
-     # ---------------------
-
-    #getUniqueValues(modifiedFile)
-
-
-    # --------------------------
-
 
     def addPivotTableToCSV(fullfilepath, GUI_input):
 
