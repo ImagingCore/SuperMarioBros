@@ -190,13 +190,16 @@ def main(inputfile,GUI_input,outputfile):
             pv_table = pd.concat([pv_table1, pv_table2], axis=0).sort_index()
 
             pv_table.rename(columns={'Sample': 'Sample_Ch1'}, inplace=True)  # rename Sample column to Ch1
-            pv_table.to_csv('/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST.csv', index=True)
+            #pv_table.to_csv('/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST.csv', index=True)
 
-            # concatenate column header for all
-            # get column headings for table 2
-            pv_table1.rename(columns={'Sample': 'Sample_Ch1'}, inplace=True)  # rename Sample column to Ch1
-            header = df.columns.tolist() + pv_table1.columns.tolist() + pv_table2_header[1:]
-            print header
+            # for "duplex" data that is not paired (i.e. ch1 and ch2 have different targets and/or samples)
+            if sum(pv_table2.columns.isin(pv_table1.columns)) != len(pv_table2_header):
+                # concatenate column header for all
+                # get column headings for table 1
+                pv_table1.rename(columns={'Sample': 'Sample_Ch1'}, inplace=True)  # rename Sample column to Ch1
+                header = df.columns.tolist() + pv_table1.columns.tolist() + pv_table2_header[1:]
+            else:
+                header = df.columns.tolist() + pv_table1.columns.tolist()
 
             # merge original csv with new pivot table
             merged_data = pd.concat([df, pv_table], axis=1, join_axes=[df.index])
