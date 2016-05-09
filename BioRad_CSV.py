@@ -3,7 +3,7 @@ import sys
 import csv
 import pandas as pd
 
-inputfile = '/Volumes/ctc2-raw4/DropletData/2016-05(May)/GU/Patients/PROSTATE 5-3-16 EE_ HDs TE&ARV7_MM_NoBlanks.csv'
+inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/Duplex_MEL_multipleBlanks.csv'
 outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST_MOD.csv'
 
 GUI_input = 'singleplex'
@@ -21,6 +21,7 @@ def main(inputfile,GUI_input,outputfile):
     # fullfilepath for outputfile
     # create output filename with same root and path as input file, adding the suffix _MOD
     outputfile = path + '/' + root + '_MOD.csv'
+    print('Output file = ' + outputfile)
 
     # ----- Error Checking #1 -----
     # (1) check to see if columns of interest exist
@@ -53,49 +54,51 @@ def main(inputfile,GUI_input,outputfile):
     dupl_df = df[dupl].sort_values('Sample') #data frame of duplicates in alphabetical order by sample
     dupl_indx = dupl_df.index.tolist()
 
-
+### WORK IN PROGRESS....###
     # rename duplicates
-    if len(dupl_indx) >= 1:
+    if len(dupl_df) >= 1:
         #statusOut = ' Multiple duplicates found in data! '
         #statusColor = 'red'
         #return statusOut, statusColor
         print 'Duplicates found in data!'
 
-        # loop through unique (duplicated) sample names
+        # loop through unique duplicated sample names
         count = 2 # initialize counter
-        for i in range(len(dupl_df)):
-            #print ('range = ' + str(len(dupl_df)))
+        for i in range(len(dupl_df['Sample'].unique())):
             sampleName = df.loc[dupl_indx[i], 'Sample']
 
-            if i != 0:
-                #if sample name is same as previous, append _count
-                if dupl_df.loc[dupl_indx[i],'Sample'] == dupl_df.loc[dupl_indx[i-1],'Sample']:
+            #number of replicates of sample name i
+            nReplicates = len(dupl_df[dupl_df['Sample'] == sampleName])
 
+            for j in range(nReplicates)
+
+
+
+            if i != 0:
+                #if sample name is same as previous, rename by appending _count
+                if dupl_df.loc[dupl_indx[i],'Sample'] == dupl_df.loc[dupl_indx[i-1],'Sample']:
                     df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
                     print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
-
                     count = count + 1
 
                 else:
-                    #print('i = ' + str(i))
-                    #print ('count = '+ str(count))
                     df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
                     print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
                     count = count + 1
 
-            else:
+            else: #for first element in sorted list (i = 0)
                 df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
                 print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                count = count + 1
 
-
-        df.to_csv(outputfile, columns = fnames_keep, index=False)
+        df.to_csv(outputfile, columns=fnames_keep, index=False)
 
         #statusOut = 'Renaming duplicate sample(s) to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
         #statusColor = 'red'
         #return statusOut, statusColor
     else:
         print 'No duplicates found'
-        df.to_csv(outputfile, colunns = fnames_keep, index=False)
+        df.to_csv(outputfile, columns=fnames_keep, index=False)
 
         #sys.exit(1)
 
@@ -106,7 +109,6 @@ def main(inputfile,GUI_input,outputfile):
     def addPivotTableToCSV(fullfilepath, GUI_input):
 
         df = pd.read_csv(fullfilepath) # load as a dataframe
-        #df = pd.read_csv(outputfile)
 
         if GUI_input == 'singleplex':
 
