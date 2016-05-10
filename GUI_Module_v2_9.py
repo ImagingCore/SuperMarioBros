@@ -48,15 +48,24 @@ class CsvGuiClass(Frame):
 
         elif optionChoice == 2:
             self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
-            if self.filename != "":
-                status_return, color = BioRad_CSV.main(self.filename, 'duplex')
-                self.updateStatus(self.master, status_return, 1, 5000, color)
+            if self.filename != '':
+                status_return, color, status_Done, donecolor = BioRad_CSV.main(self.filename, 'duplex')
+                self.updateStatus(self.master, status_return, 1, 2000, color)
+                if status_Done != '':
+                    def done_stat():
+                        self.updateStatus(self.master, status_Done, 1, 3000, donecolor)
+                    self.master.after(5000, done_stat)
+
 
         elif optionChoice == 3:
             self.filename = tkFileDialog.askopenfilename(filetypes=[("CSV", "*.csv")])
-            if self.filename != "":
-                status_return, color = BioRad_CSV.main(self.filename,'singleplex')
-                self.updateStatus(self.master, status_return, 1, 5000, color)
+            if self.filename != '':
+                status_return, color, status_Done, donecolor = BioRad_CSV.main(self.filename, 'singleplex')
+                self.updateStatus(self.master, status_return, 1, 2000, color)
+                if status_Done != '':
+                    def done_stat():
+                        self.updateStatus(self.master, status_Done, 1, 3000, donecolor)
+                    self.master.after(5000, done_stat)
 
         else:
             print "INTERNAL ERROR: else condition inside Operations"

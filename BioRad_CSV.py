@@ -1,15 +1,21 @@
 import os
-import sys
-import csv
+#import sys
+#import csv
 import pandas as pd
 
-inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/PROSTATE 3-25-16 EE_FFPE#1 T-E&ARV7_GAPDH.csv'
-outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST_MOD.csv'
+#inputfile = '/Users/konstk/Desktop/duplex test file 1.csv'
+#outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST_MOD.csv'
+#GUI_input = 'duplex'
 
-GUI_input = 'duplex'
 
-def main(inputfile,GUI_input,outputfile):
+def main(inputfile,GUI_input):
 # main function accepts filename, and GUI input. Options: 'duplex' or 'singleplex'
+    global statusOut, statusColor, statusDoneOut, statusDoneColor
+    statusOut =  ''
+    statusColor = ''
+    statusDoneOut = ''
+    statusDoneColor = ''
+
 
     # load as a dataframe
     df = pd.read_csv(inputfile, index_col=False)
@@ -22,7 +28,7 @@ def main(inputfile,GUI_input,outputfile):
     # fullfilepath for outputfile
     # create output filename with same root and path as input file, adding the suffix _MOD
     outputfile = path + '/' + root + '_MOD.csv'
-    print('Output file = ' + outputfile)
+    #print('Output file = ' + outputfile)
 
     # ----- Error Checking #1 -----
     # (1) check to see if columns of interest exist
@@ -33,9 +39,9 @@ def main(inputfile,GUI_input,outputfile):
             if fname not in df.columns:
                 statusOut = ' Missing data columns! '
                 statusColor = 'red'
-                #return statusOut, statusColor
-                print('Missing data columns!')
-                sys.exit(1)
+                return statusOut, statusColor, statusDoneOut, statusDoneColor
+                #print('Missing data columns!')
+                #sys.exit(1)
 
     elif GUI_input == 'duplex':
         # fieldnames to keep (duplex samples)
@@ -44,10 +50,11 @@ def main(inputfile,GUI_input,outputfile):
             if fname not in df.columns:
                 statusOut = ' Missing data columns!'
                 statusColor = 'red'
-                #return statusOut, statusColor
-                print('Missing data columns!')
-                sys.exit(1)
-    print 'Input data is good'
+                return statusOut, statusColor, statusDoneOut, statusDoneColor
+                #print('Missing data columns!')
+                #ys.exit(1)
+    #print 'Input data is good'
+
 
     # (2) find duplicates in data
     dupl = df.duplicated(['Sample', 'TargetType', 'Target']) # output: bool
@@ -58,10 +65,8 @@ def main(inputfile,GUI_input,outputfile):
 
     # rename duplicates
     if len(dupl_df) >= 1:
-        #statusOut = ' Multiple duplicates found in data! '
-        #statusColor = 'red'
-        #return statusOut, statusColor
-        print 'Duplicates found in data!'
+
+        #print 'Duplicates found in data!'
 
         # loop through unique duplicated sample names
         count = 2 # initialize counter
@@ -73,26 +78,31 @@ def main(inputfile,GUI_input,outputfile):
                 #if sample name is same as previous, rename by appending _count
                 if dupl_df.loc[dupl_indx[i],'Sample'] == dupl_df.loc[dupl_indx[i-1],'Sample']:
                     df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
-                    print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                    # print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                    statusOut = ' Renaming duplicate sample(s) to: ' + sampleName + '_' + str(count)
+                    statusColor = 'brown'
                     count = count + 1
 
                 else:
                     count = 2
                     df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
-                    print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                    #print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                    statusOut = ' Renaming duplicate sample(s) to: ' + sampleName + '_' + str(count)
+                    statusColor = 'brown'
                     count = count + 1
+
             else: #for first element in sorted list (i = 0)
                 df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
-                print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                #print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                statusOut = ' Renaming duplicate sample(s) to: ' + sampleName + '_' + str(count)
+                statusColor = 'brown'
                 count = count + 1
 
         df.to_csv(outputfile, columns=fnames_keep, index=False)
 
-        #statusOut = 'Renaming duplicate sample(s) to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
-        #statusColor = 'red'
-        #return statusOut, statusColor
     else:
-        print 'No duplicates found'
+        statusOut = ' No duplicates found'
+        statusColor = 'darkgreen'
         df.to_csv(outputfile, columns=fnames_keep, index=False)
 
         #sys.exit(1)
@@ -179,14 +189,15 @@ def main(inputfile,GUI_input,outputfile):
         #writeShortCSV(outputfile, fnames_keep)
         #print 'test'
         addPivotTableToCSV(outputfile, GUI_input)
-        #statusOut = ' Done!  Output file: ' + root + '_MOD.csv'
-        #statusColor = 'darkgreen'
-        #return statusOut, statusColor
+        statusDoneOut = ' Done!  >>> Output file: ' + root + '_MOD.csv'
+        statusDoneColor = 'darkgreen'
+
+        return statusOut, statusColor, statusDoneOut, statusDoneColor
         # means the process is complete, the external GUI is able to report "Done" status writing in green color
 
-
-if __name__ == "__main__":
-    main(inputfile,GUI_input,outputfile)
+#
+# if __name__ == "__main__":
+#     main(inputfile, GUI_input)
 
 
 
