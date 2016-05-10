@@ -290,8 +290,8 @@ def main():
     # Developer: remember to update these!
     global VERSION_DATE
     global VERSION_NUMBER
-    VERSION_DATE = "4/22/16"
-    VERSION_NUMBER = "2.9.1"
+    VERSION_DATE = "5/10/16"
+    VERSION_NUMBER = "2.9.2"
 
 
     # start main GUI window.
