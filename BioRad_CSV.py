@@ -33,8 +33,10 @@ def main(inputfile,GUI_input):
     # ----- Error Checking #1 -----
     # (1) check to see if columns of interest exist
     if GUI_input == 'singleplex':
-
-        fnames_keep = ['Well', 'Sample', 'TargetType' ,'Target', 'CopiesPer20uLWell']
+        # fieldnames to keep (singleplex samples) -> 'TargetType' is included here to make the missing columns
+        # check more versatile (i.e. not dependent on the file type). 'TargetType' is necessary to perform the
+        # file compatibility check (below)
+        fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
         for fname in fnames_keep:
             if fname not in df.columns:
                 statusOut = ' Missing data columns! '
@@ -49,6 +51,8 @@ def main(inputfile,GUI_input):
             statusColor = 'red'
             return statusOut, statusColor, statusDoneOut, statusDoneColor
 
+        # re-update fnames_keep to include only the columns needed for singleplex
+        fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
 
     elif GUI_input == 'duplex':
 
@@ -62,8 +66,8 @@ def main(inputfile,GUI_input):
                 #print('Missing data columns!')
                 #ys.exit(1)
     #print 'Input data is good'
-                # File compatibility check: dueplex must have 2 channels
 
+        # File compatibility check: duplex must have 2 channels
         if len(df.TargetType.unique()) != 2:
             statusOut = ' Not a duplex file! '
             statusColor = 'red'
