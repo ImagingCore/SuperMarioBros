@@ -33,17 +33,25 @@ def main(inputfile,GUI_input):
     # ----- Error Checking #1 -----
     # (1) check to see if columns of interest exist
     if GUI_input == 'singleplex':
-        # fieldnames to keep (singleplex samples)
-        fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
+
+        fnames_keep = ['Well', 'Sample', 'TargetType' ,'Target', 'CopiesPer20uLWell']
         for fname in fnames_keep:
             if fname not in df.columns:
                 statusOut = ' Missing data columns! '
                 statusColor = 'red'
                 return statusOut, statusColor, statusDoneOut, statusDoneColor
-                #print('Missing data columns!')
-                #sys.exit(1)
+                # print('Missing data columns!')
+                # sys.exit(1)
+
+        # File compatibility check: singleplex must have only one channel
+        if len(df.TargetType.unique()) != 1:
+            statusOut = ' Not a singleplex file! '
+            statusColor = 'red'
+            return statusOut, statusColor, statusDoneOut, statusDoneColor
+
 
     elif GUI_input == 'duplex':
+
         # fieldnames to keep (duplex samples)
         fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
         for fname in fnames_keep:
@@ -54,6 +62,12 @@ def main(inputfile,GUI_input):
                 #print('Missing data columns!')
                 #ys.exit(1)
     #print 'Input data is good'
+                # File compatibility check: dueplex must have 2 channels
+
+        if len(df.TargetType.unique()) != 2:
+            statusOut = ' Not a duplex file! '
+            statusColor = 'red'
+            return statusOut, statusColor, statusDoneOut, statusDoneColor
 
 
     # (2) find duplicates in data
