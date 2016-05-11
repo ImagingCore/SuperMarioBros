@@ -1,20 +1,25 @@
 import os
-import sys
-import csv
+#import sys
+#import csv
 import pandas as pd
 
-inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST_multipleDuplicatesAndBlanks.csv'
-outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST_MOD.csv'
+#inputfile = '/Users/konstk/Desktop/duplex test file 1.csv'
+#outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST_MOD.csv'
+#GUI_input = 'duplex'
 
-GUI_input = 'duplex'
 
-def main(inputfile,GUI_input,outputfile):
+def main(inputfile,GUI_input):
 # main function accepts filename, and GUI input. Options: 'duplex' or 'singleplex'
+    global statusOut, statusColor, statusDoneOut, statusDoneColor
+    statusOut =  ''
+    statusColor = ''
+    statusDoneOut = ''
+    statusDoneColor = ''
+
 
     # load as a dataframe
     df = pd.read_csv(inputfile, index_col=False)
-    df.dropna(how='all', inplace=True) # remove blank rows
-    df['Target'].fillna('Blank', inplace=True) # replace column NANs with 'Blank'
+    df['Target'].fillna('Blank', inplace=True) # replace NANs with 'Blank'
 
     # parse fullfilepath
     path, filename = os.path.split(inputfile)
@@ -23,32 +28,51 @@ def main(inputfile,GUI_input,outputfile):
     # fullfilepath for outputfile
     # create output filename with same root and path as input file, adding the suffix _MOD
     outputfile = path + '/' + root + '_MOD.csv'
-    print('Output file = ' + outputfile)
+    #print('Output file = ' + outputfile)
 
     # ----- Error Checking #1 -----
     # (1) check to see if columns of interest exist
     if GUI_input == 'singleplex':
-        # fieldnames to keep (singleplex samples)
-        fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
+        # fieldnames to keep (singleplex samples) -> 'TargetType' is included here to make the missing columns
+        # check more versatile (i.e. not dependent on the file type). 'TargetType' is necessary to perform the
+        # file compatibility check (below)
+        fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
         for fname in fnames_keep:
             if fname not in df.columns:
                 statusOut = ' Missing data columns! '
                 statusColor = 'red'
-                #return statusOut, statusColor
-                print('Missing data columns!')
-                sys.exit(1)
+                return statusOut, statusColor, statusDoneOut, statusDoneColor
+                # print('Missing data columns!')
+                # sys.exit(1)
+
+        # File compatibility check: singleplex must have only one channel under 'TargetType'
+        if len(df.TargetType.unique()) != 1:
+            statusOut = ' Not a singleplex file! '
+            statusColor = 'red'
+            return statusOut, statusColor, statusDoneOut, statusDoneColor
+
+        # re-update fnames_keep to include only the columns needed for singleplex
+        fnames_keep = ['Well', 'Sample', 'Target', 'CopiesPer20uLWell']
 
     elif GUI_input == 'duplex':
+
         # fieldnames to keep (duplex samples)
         fnames_keep = ['Well', 'Sample', 'TargetType', 'Target', 'CopiesPer20uLWell']
         for fname in fnames_keep:
             if fname not in df.columns:
                 statusOut = ' Missing data columns!'
                 statusColor = 'red'
-                #return statusOut, statusColor
-                print('Missing data columns!')
-                sys.exit(1)
-    print 'Input data is good'
+                return statusOut, statusColor, statusDoneOut, statusDoneColor
+                #print('Missing data columns!')
+                #ys.exit(1)
+    #print 'Input data is good'
+
+        # File compatibility check: duplex must have 2 channels under 'TargetType'
+        if len(df.TargetType.unique()) != 2:
+            statusOut = ' Not a duplex file! '
+            statusColor = 'red'
+            return statusOut, statusColor, statusDoneOut, statusDoneColor
+
 
     # (2) find duplicates in data
     dupl = df.duplicated(['Sample', 'TargetType', 'Target']) # output: bool
@@ -56,42 +80,47 @@ def main(inputfile,GUI_input,outputfile):
     dupl_df = df[dupl].sort_values('Sample') #data frame of duplicates in alphabetical order by sample
     dupl_indx = dupl_df.index.tolist()
 
+
     # rename duplicates
     if len(dupl_df) >= 1:
-        #statusOut = ' Multiple duplicates found in data! '
-        #statusColor = 'red'
-        #return statusOut, statusColor
-        print 'Duplicates found in data!'
+
+        #print 'Duplicates found in data!'
 
         # loop through unique duplicated sample names
         count = 2 # initialize counter
         for i in range(len(dupl_df)):
             sampleName = df.loc[dupl_indx[i], 'Sample']
 
+
             if i != 0:
                 #if sample name is same as previous, rename by appending _count
                 if dupl_df.loc[dupl_indx[i],'Sample'] == dupl_df.loc[dupl_indx[i-1],'Sample']:
                     df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
-                    print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                    # print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                    statusOut = ' Renaming duplicate sample(s) to: ' + sampleName + '_' + str(count)
+                    statusColor = 'brown'
                     count = count + 1
 
                 else:
                     count = 2
                     df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
-                    print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                    #print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                    statusOut = ' Renaming duplicate sample(s) to: ' + sampleName + '_' + str(count)
+                    statusColor = 'brown'
                     count = count + 1
+
             else: #for first element in sorted list (i = 0)
                 df.loc[dupl_indx[i], 'Sample'] = sampleName + '_' + str(count)
-                print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                #print('Renaming duplicate sample(s)to: ' + sampleName + '_' + str(count))
+                statusOut = ' Renaming duplicate sample(s) to: ' + sampleName + '_' + str(count)
+                statusColor = 'brown'
                 count = count + 1
 
         df.to_csv(outputfile, columns=fnames_keep, index=False)
 
-        #statusOut = 'Renaming duplicate sample(s) to:  ' + df.loc[dupl_indx,'Sample'].tolist()[0]
-        #statusColor = 'red'
-        #return statusOut, statusColor
     else:
-        print 'No duplicates found'
+        statusOut = ' No duplicates found'
+        statusColor = 'darkgreen'
         df.to_csv(outputfile, columns=fnames_keep, index=False)
 
         #sys.exit(1)
@@ -178,14 +207,15 @@ def main(inputfile,GUI_input,outputfile):
         #writeShortCSV(outputfile, fnames_keep)
         #print 'test'
         addPivotTableToCSV(outputfile, GUI_input)
-        #statusOut = ' Done!  Output file: ' + root + '_MOD.csv'
-        #statusColor = 'darkgreen'
-        #return statusOut, statusColor
+        statusDoneOut = ' Done!  >>> Output file: ' + root + '_MOD.csv'
+        statusDoneColor = 'darkgreen'
+
+        return statusOut, statusColor, statusDoneOut, statusDoneColor
         # means the process is complete, the external GUI is able to report "Done" status writing in green color
 
-
-if __name__ == "__main__":
-    main(inputfile,GUI_input,outputfile)
+#
+# if __name__ == "__main__":
+#     main(inputfile, GUI_input)
 
 
 
