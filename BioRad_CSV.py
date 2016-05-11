@@ -19,7 +19,8 @@ def main(inputfile,GUI_input):
 
     # load as a dataframe
     df = pd.read_csv(inputfile, index_col=False)
-    df['Target'].fillna('Blank', inplace=True) # replace NANs with 'Blank'
+    df.dropna(how='all', inplace=True) # remove blank rows
+    df['Target'].fillna('Blank', inplace=True) # replace column NANs with 'Blank'
 
     # parse fullfilepath
     path, filename = os.path.split(inputfile)
