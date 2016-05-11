@@ -3,7 +3,7 @@ import sys
 import csv
 import pandas as pd
 
-inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/PROSTATE 3-25-16 EE_FFPE#1 T-E&ARV7_GAPDH.csv'
+inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST_multipleDuplicatesAndBlanks.csv'
 outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/Data/TEST_MOD.csv'
 
 GUI_input = 'duplex'
@@ -13,7 +13,8 @@ def main(inputfile,GUI_input,outputfile):
 
     # load as a dataframe
     df = pd.read_csv(inputfile, index_col=False)
-    df['Target'].fillna('Blank', inplace=True) # replace NANs with 'Blank'
+    df.dropna(how='all', inplace=True) # remove blank rows
+    df['Target'].fillna('Blank', inplace=True) # replace column NANs with 'Blank'
 
     # parse fullfilepath
     path, filename = os.path.split(inputfile)
@@ -55,7 +56,6 @@ def main(inputfile,GUI_input,outputfile):
     dupl_df = df[dupl].sort_values('Sample') #data frame of duplicates in alphabetical order by sample
     dupl_indx = dupl_df.index.tolist()
 
-
     # rename duplicates
     if len(dupl_df) >= 1:
         #statusOut = ' Multiple duplicates found in data! '
@@ -67,7 +67,6 @@ def main(inputfile,GUI_input,outputfile):
         count = 2 # initialize counter
         for i in range(len(dupl_df)):
             sampleName = df.loc[dupl_indx[i], 'Sample']
-
 
             if i != 0:
                 #if sample name is same as previous, rename by appending _count
