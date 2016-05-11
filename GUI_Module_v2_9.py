@@ -291,7 +291,7 @@ def main():
     global VERSION_DATE
     global VERSION_NUMBER
     VERSION_DATE = "5/11/16"
-    VERSION_NUMBER = "2.9.3"
+    VERSION_NUMBER = "2.9.4"
 
 
     # start main GUI window.
