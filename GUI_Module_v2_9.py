@@ -290,13 +290,13 @@ def main():
     # Developer: remember to update these!
     global VERSION_DATE
     global VERSION_NUMBER
-    VERSION_DATE = "5/10/16"
-    VERSION_NUMBER = "2.9.2"
+    VERSION_DATE = "5/11/16"
+    VERSION_NUMBER = "2.9.3"
 
 
     # start main GUI window.
     # Instantiate a CsvGuiClass object.
-    # Developer: select GUI version (1 or 2)
+    # Developer: select GUI version (1-5)
     root = Tk()
     root.title("Snake Tools")
     mainWindow = CsvGuiClass(master=root, version=5)

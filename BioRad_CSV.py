@@ -45,7 +45,7 @@ def main(inputfile,GUI_input):
                 # print('Missing data columns!')
                 # sys.exit(1)
 
-        # File compatibility check: singleplex must have only one channel
+        # File compatibility check: singleplex must have only one channel under 'TargetType'
         if len(df.TargetType.unique()) != 1:
             statusOut = ' Not a singleplex file! '
             statusColor = 'red'
@@ -67,7 +67,7 @@ def main(inputfile,GUI_input):
                 #ys.exit(1)
     #print 'Input data is good'
 
-        # File compatibility check: duplex must have 2 channels
+        # File compatibility check: duplex must have 2 channels under 'TargetType'
         if len(df.TargetType.unique()) != 2:
             statusOut = ' Not a duplex file! '
             statusColor = 'red'
