@@ -4,7 +4,6 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/MelData/MelRawDropletData_20160526.csv'
 outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/MelData/MelRawDropletData_20160526_mod.csv'
 
