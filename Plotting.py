@@ -32,11 +32,13 @@ markersTotals.rename(columns={0: 'MarkersTotals'}, inplace=True) # rename column
 # loop through each unique patient and plot time series
 for p in patients:
 
-    #p = 'PEM-15'
+    p = 'PEM-15'
     # pp = PdfPages('/Users/lindanieman/Documents/WORK/MGH CC/Droplets/MelData/PlotOutput/' + p + '_plots.pdf')
 
     with PdfPages(outputdir + p + '_plots.pdf') as pdf:
+
         fig = plt.figure(figsize=(12,8))
+        plt.suptitle(p + '\n Copies/mL vs. Time (weeks)', fontsize=14, fontweight='bold')
 
         for m in xrange(0,len(markers)): #(start,stop,step)
 
@@ -46,10 +48,8 @@ for p in patients:
                 plt.subplot(5,4,m+1)
                 plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markers.ix[m][0]], '-ro', markersize=10)
 
-                plt.suptitle(p + '\n Copies/mL vs. Time from initial draw (weeks)', fontsize=14, fontweight='bold')
                 plt.ylabel(markers.ix[m][0] + '\n (copies / mL)', fontsize = 8)
                 #plt.xlabel('Time (weeks)', fontsize=8)
-
 
                 plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=0.4)
                 ax = plt.gca()
@@ -63,9 +63,22 @@ for p in patients:
         plt.close()
         # plt.show()
 
-        fig = plt.figure(figsize=(12, 8))
+        fig = plt.figure()
+        plt.suptitle(p + '\n Copies/mL vs. Time (weeks)', fontsize=14, fontweight='bold')
+        for n in xrange(0,len(markersTotals)):
 
+            plt.subplot(2,2,n+1)
+            plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markersTotals.ix[n][0]], '-ro')
+            plt.title(markersTotals.ix[n][0], fontsize=12)
+            #plt.ylabel(markersTotals.ix[n][0] + '\n (copies / mL)', fontsize=12)
 
+            plt.subplots_adjust(left=0.15, bottom=None, right=0.95, top=0.85, wspace=0.5, hspace=0.4)
+            ax = plt.gca()
+            ax.tick_params(axis='y', labelsize=8)
+
+        #plt.show()
+        pdf.savefig()
+        plt.close()
 
 # add marker different marker colors for TN, PD, RD, etc
 # log2 normalization
