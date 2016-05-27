@@ -3,6 +3,8 @@ import os
 #import csv
 import pandas as pd
 import matplotlib.pyplot as plt
+plt.ioff() # turn off intereactive mode so will only display figures if explicitly called
+from matplotlib.backends.backend_pdf import PdfPages
 
 inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/MelData/MelRawDropletData_20160526.csv'
 outputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/MelData/MelRawDropletData_20160526_mod.csv'
@@ -20,29 +22,96 @@ df['DrawDate'] = pd.to_datetime(df['DrawDate'],infer_datetime_format=True) #chan
 path, filename = os.path.split(inputfile)
 root, ext = os.path.splitext(filename)
 
-markers = pd.DataFrame(['FAT1-1', 'GRP143', 'IL13RA2', 'MAGEA2', 'MAGEC2', 'PMEL', 'SFRP1', 'TFAP2C', 'TNC', 'CSPG4', 'FAT2', 'GAGE1',\
-           'MAGEA1', 'MAGEA4', 'MAGEA6', 'MLANA', 'PRAME', 'SOX10', 'TYRP1', 'TotalDropletsPerMLblood', 'LineageSpecific',\
-           'CarcinomebryonicAntigen', 'SignalTransduction']);
+markers = pd.DataFrame(['FAT1-1', 'GRP143', 'IL13RA2', 'MAGEA2', 'MAGEC2', 'PMEL', 'SFRP1', 'TFAP2C', 'TNC', 'CSPG4', 'FAT2', 'GAGE1', \
+                        'MAGEA1', 'MAGEA4', 'MAGEA6', 'MLANA', 'PRAME', 'SOX10', 'TYRP1', 'TotalDropletsPerMLblood', 'LineageSpecific', \
+                        'CarcinomebryonicAntigen', 'SignalTransduction']);
 markers.rename(columns={0: 'Marker'}, inplace=True) # rename column
 
-
-
 # loop through each unique patient and plot time series
- for p in patients:
+for p in patients:
 
-     p = 'PEM-15'
-     for m in range(len(markers)):
+    p = 'PEM-15'
+    pp = PdfPages('/Users/lindanieman/Documents/WORK/MGH CC/Droplets/MelData/PlotOutput/' + p + '_plots.pdf')
 
-         #m=3
-         plt.figure(m)
-         pData = df.loc[df.Patient_ID == p]
-         plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markers[m]], '-ro', markersize=12)
-         plt.ylabel(markers[m] + ' (copies / mL)')
-         plt.xlabel('Time from initial blood draw (weeks)')
-         plt.title(p)
+    for m in xrange(0,len(markers),4): #(start,stop,step)
+
+        if len(markers) >= (m+4):
+
+            plt.figure(m)
+            plt.suptitle(p, fontsize=14, fontweight='bold')
+            pData = df.loc[df.Patient_ID == p]
+
+            plt.subplot(221)
+            #plt.tight_layout()
+            plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markers.ix[m][0]], '-ro', markersize=10)
+            plt.ylabel(markers.ix[m][0] + ' (copies / mL)')
+            #plt.xlabel('Time from initial blood draw (weeks)')
+            #plt.title(p)
+
+            plt.subplot(222)
+            plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markers.ix[m+1][0]], '-ro', markersize=12)
+            plt.ylabel(markers.ix[m+1][0] + ' (copies / mL)')
+            #plt.xlabel('Time from initial blood draw (weeks)')
+            #plt.title(p)
+
+            plt.subplot(223)
+            plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markers.ix[m + 2][0]], '-ro', markersize=12)
+            plt.ylabel(markers.ix[m+2][0] + ' (copies / mL)')
+            plt.xlabel('Time from initial blood draw (weeks)')
+            #plt.title(p)
+
+            plt.subplot(224)
+            plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markers.ix[m + 3][0]], '-ro', markersize=12)
+            plt.ylabel(markers.ix[m+3][0] + ' (copies / mL)')
+            plt.xlabel('Time from initial blood draw (weeks)')
+            #plt.title(p)
+
+            plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=None)
+            #plt.savefig(pp,format='pdf')
+            pp.savefig()
+            plt.close()
+            #plt.show()
+
+        else:
+            plt.figure(m)
+            plt.suptitle(p, fontsize=14, fontweight='bold')
+            pData = df.loc[df.Patient_ID == p]
+
+            plt.subplot(221)
+            plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markers.ix[m][0]], '-ro', markersize=12)
+            plt.ylabel(markers.ix[m][0] + ' (copies / mL)')
+            #plt.xlabel('Time from initial blood draw (weeks)')
+            #plt.title(p)
+
+            plt.subplot(222)
+            plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markers.ix[m + 1][0]], '-ro', markersize=12)
+            plt.ylabel(markers.ix[m + 1][0] + ' (copies / mL)')
+            #plt.xlabel('Time from initial blood draw (weeks)')
+            #plt.title(p)
+
+            plt.subplot(223)
+            plt.plot(pData.TimeFromInitialBloodDraw_weeks, pData[markers.ix[m + 2][0]], '-ro', markersize=12)
+            plt.ylabel(markers.ix[m + 2][0] + ' (copies / mL)')
+            plt.xlabel('Time from initial blood draw (weeks)')
+            #plt.title(p)
+
+            # plt.savefig(pp,format='pdf')
+            plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=None)
+            pp.savefig()
+            plt.close()
+            # plt.show()
+
+    pp.close()
+
+    # add marker different marker colors for TN, PD, RD, etc
+    # log2 normalization
+    # create stacked bar graphs
+    # add clinical annotations
 
 
- plt.close('all')
+
+
+plt.close('all')
 
      # get date
 
