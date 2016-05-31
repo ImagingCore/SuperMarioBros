@@ -107,8 +107,10 @@ for p in patients:
 
 
 ## plot stacked barplots
-def stackedBarPlots(pData, markers)
-# this function plots a stacked bar graph
+def stackedBarPlots(pData, markers):
+    # this function plots a stacked bar graph
+
+    pData = df.loc[df.Patient_ID == p]
 
     fig_bar = plt.figure()
     markersSorted = markers.sort_values('Marker', axis=0) # sort markers names alphabetically
@@ -118,37 +120,38 @@ def stackedBarPlots(pData, markers)
     barWidth = 0.4
     y_offset = np.array([0.0] * len(bar_x))
 
+    # Get some colors for bars
+    colors = plt.cm.Set1(np.linspace(0, 0.75, len(markers)))
 
     for m in xrange(0, len(markers)):  # (start,stop,step)
 
         if len(markers) <= 20:
-            pData = df.loc[df.Patient_ID == p]
 
             #x = pData.TimeFromInitialBloodDraw_weeks
             # y=pData[markers.ix[m][0]]
             y = np.log2(pData[markers.ix[m][0]] + 1)  # take log2(x+1)
-            plt.bar(bar_x, y, barWidth, bottom=y_offset)
+            plt.bar(bar_x, y, barWidth, bottom=y_offset, color = colors[m])
             y_offset = y_offset + y
 
         else:
             print 'Number of markers is greater than 20! \Modify for loop code'
 
 
-plt.ylabel('log2(x+1)' + '\n (copies / mL)', fontsize=16)
-plt.xlabel('Time (weeks)', fontsize=16)
-plt.title(p, fontsize=18)
-plt.xticks(pd.Series(bar_x) + barWidth / 2., pData.TimeFromInitialBloodDraw_weeks)
+    plt.ylabel('log2(x+1)' + '\n (copies / mL)', fontsize=16)
+    plt.xlabel('Time (weeks)', fontsize=16)
+    plt.title(p, fontsize=18)
+    plt.xticks(pd.Series(bar_x) + barWidth / 2, pData.TimeFromInitialBloodDraw_weeks)
 
 
 
-plt.yticks(np.arange(0, 81, 10))
-plt.legend((p1[0], p2[0]), ('Men', 'Women'))
+#plt.yticks(np.arange(0, 81, 10))
+#plt.legend((p1[0], p2[0]), ('Men', 'Women'))
 
 
-pdf.savefig()
-plt.close()
+#pdf.savefig()
+#plt.close()
 
-stackedBarPlots()
+stackedBarPlots(pData,markers)
 
 
 
