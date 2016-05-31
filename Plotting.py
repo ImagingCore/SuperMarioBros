@@ -29,6 +29,7 @@ markersTotals = pd.DataFrame([ 'TotalDropletsPerMLblood', 'LineageSpecific', 'Ca
 markers.rename(columns={0: 'Marker'}, inplace=True) # rename column
 markersTotals.rename(columns={0: 'MarkersTotals'}, inplace=True) # rename column
 
+
 # loop through each unique patient and plot time series
 for p in patients:
 
@@ -40,6 +41,8 @@ for p in patients:
         fig = plt.figure(figsize=(12,8))
         plt.suptitle(p + '\n Copies/mL vs. Time (weeks)', fontsize=14, fontweight='bold')
 
+        # -------------------------------------------------
+        # plot each marker separately as a function of time
         for m in xrange(0,len(markers)): #(start,stop,step)
 
             if len(markers) <= 20:
@@ -64,12 +67,15 @@ for p in patients:
             else:
                 print 'Number of markers is greater than 20! \Modify for loop code'
 
+
+
         pdf.savefig()
         plt.close()
         #plt.show()
 
 
-
+        # ---------------------------------------------------------------------
+        # plot totals, lineaage specific, carcinoembryonic, signaltransduction
         fig = plt.figure()
         plt.suptitle(p + '\n Copies/mL vs. Time (weeks)', fontsize=14, fontweight='bold')
         for n in xrange(0,len(markersTotals)):
@@ -100,8 +106,59 @@ for p in patients:
         plt.close()
 
 
+## plot stacked barplots
+def stackedBarPlots(pData, markers)
+# this function plots a stacked bar graph
 
-# create stacked bar graphs
+    fig_bar = plt.figure()
+    markersSorted = markers.sort_values('Marker', axis=0) # sort markers names alphabetically
+
+    bar_x = range(0, len(pData.TimeFromInitialBloodDraw_weeks),1)
+    bar_y = markers.ix[:,'Marker']
+    barWidth = 0.4
+    y_offset = np.array([0.0] * len(bar_x))
+
+
+    for m in xrange(0, len(markers)):  # (start,stop,step)
+
+        if len(markers) <= 20:
+            pData = df.loc[df.Patient_ID == p]
+
+            #x = pData.TimeFromInitialBloodDraw_weeks
+            # y=pData[markers.ix[m][0]]
+            y = np.log2(pData[markers.ix[m][0]] + 1)  # take log2(x+1)
+            plt.bar(bar_x, y, barWidth, bottom=y_offset)
+            y_offset = y_offset + y
+
+        else:
+            print 'Number of markers is greater than 20! \Modify for loop code'
+
+
+plt.ylabel('log2(x+1)' + '\n (copies / mL)', fontsize=16)
+plt.xlabel('Time (weeks)', fontsize=16)
+plt.title(p, fontsize=18)
+plt.xticks(pd.Series(bar_x) + barWidth / 2., pData.TimeFromInitialBloodDraw_weeks)
+
+
+
+plt.yticks(np.arange(0, 81, 10))
+plt.legend((p1[0], p2[0]), ('Men', 'Women'))
+
+
+pdf.savefig()
+plt.close()
+
+stackedBarPlots()
+
+
+
+
+
+
+
+
+
+
 # add clinical annotations
 
 #plt.close('all')
