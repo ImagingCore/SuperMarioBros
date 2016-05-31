@@ -1,6 +1,4 @@
 import os
-#import sys
-#import csv
 import pandas as pd
 import matplotlib.pyplot as plt
 plt.ioff() # turn off intereactive mode so will only display figures if explicitly called
@@ -69,7 +67,7 @@ for p in patients:
 
 
 
-        pdf.savefig()
+        #pdf.savefig()
         plt.close()
         #plt.show()
 
@@ -102,25 +100,28 @@ for p in patients:
                             arrowprops = dict(arrowstyle = '->', connectionstyle = 'arc3,rad=0'),fontsize=8)
 
         #plt.show()
-        pdf.savefig()
+        #pdf.savefig()
         plt.close()
 
 
 ## plot stacked barplots
+p = 'PEM-15'
+pData = df.loc[df.Patient_ID == p]
+
 def stackedBarPlots(pData, markers):
     # this function plots a stacked bar graph
 
-    pData = df.loc[df.Patient_ID == p]
+    markers.sort_values('Marker', axis=0, inplace=True) # sort markers names alphabetically
+    markers.reset_index(drop=True, inplace=True)
 
     fig_bar = plt.figure()
-    markersSorted = markers.sort_values('Marker', axis=0) # sort markers names alphabetically
 
-    bar_x = range(0, len(pData.TimeFromInitialBloodDraw_weeks),1)
-    bar_y = markers.ix[:,'Marker']
+
+    bar_x = np.arange(len(pData.TimeFromInitialBloodDraw_weeks)) +0.2
     barWidth = 0.4
     y_offset = np.array([0.0] * len(bar_x))
 
-    # Get some colors for bars
+    # Get colors for bars
     colors = plt.cm.Set1(np.linspace(0, 0.75, len(markers)))
 
     for m in xrange(0, len(markers)):  # (start,stop,step)
@@ -130,8 +131,9 @@ def stackedBarPlots(pData, markers):
             #x = pData.TimeFromInitialBloodDraw_weeks
             # y=pData[markers.ix[m][0]]
             y = np.log2(pData[markers.ix[m][0]] + 1)  # take log2(x+1)
-            plt.bar(bar_x, y, barWidth, bottom=y_offset, color = colors[m])
+            plt.bar(bar_x, y, barWidth, bottom=y_offset, color = colors[m], label=markers.ix[m,'Marker'])
             y_offset = y_offset + y
+
 
         else:
             print 'Number of markers is greater than 20! \Modify for loop code'
@@ -141,16 +143,23 @@ def stackedBarPlots(pData, markers):
     plt.xlabel('Time (weeks)', fontsize=16)
     plt.title(p, fontsize=18)
     plt.xticks(pd.Series(bar_x) + barWidth / 2, pData.TimeFromInitialBloodDraw_weeks)
+    plt.subplots_adjust(left=None, bottom=None, right=0.75, top=None, wspace=None, hspace=None)
+
+    #legends = []
+    #i = 0
+    #for column in df.columns:
+    #    legends.append(mpatches.Patch(color=stacked_colors[i], label=column))
+     #   i += 1
+      #  plt.legend(handles=legends)
+
+    plt.legend(bbox_to_anchor=(1.05,1), loc=2, borderaxespad=0, fontsize=10)#colors,markersSorted['Marker'])
+    #plt.yticks(np.arange(0, 81, 10))
+    #plt.legend((p1[0], p2[0]), ('Men', 'Women'))
+    plt.show()
 
 
-
-#plt.yticks(np.arange(0, 81, 10))
-#plt.legend((p1[0], p2[0]), ('Men', 'Women'))
-
-
-#pdf.savefig()
-#plt.close()
-
+#
+#
 stackedBarPlots(pData,markers)
 
 
@@ -162,7 +171,7 @@ stackedBarPlots(pData,markers)
 
 
 
-# add clinical annotations
+# add clinical annotations as table in subplot
 
 #plt.close('all')
 
