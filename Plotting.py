@@ -143,9 +143,12 @@ def stackedBarPlots(pData, markers):
     ax = plt.gca()
     ax.axis('off')
     cellTEXT = [[txt] for txt in pData.ClinicalAnnotations]
-    rowLABELS = [[str(rtxt) + ' weeks'] for rtxt in pData.TimeFromInitialBloodDraw_weeks.tolist()]
+    rowLABELS = [(str(rtxt) + ' weeks') for rtxt in pData.TimeFromInitialBloodDraw_weeks.tolist()]
     colLABELS = ['Clinical Annotation']
-    the_table = ax.table(cellText=cellTEXT,colLabels=colLABELS,rowLabels=rowLABELS,loc='center')
+    the_table = plt.table(cellText=cellTEXT,colLabels=colLABELS,rowLabels=rowLABELS,loc='center',cellLoc='center')
+    # or the_table = ax.table(...)
+    the_table.set_fontsize(14)
+    the_table.scale(1,1.5)
     table_props = the_table.properties()
     table_cells = table_props['child_artists']
 
