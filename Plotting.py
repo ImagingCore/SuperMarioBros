@@ -102,44 +102,54 @@ def main(inputfile,outputdir):
             pdf.savefig()
             plt.close()
 
-            def stackedBarPlots(pData, markers):
-                # this function plots a stacked bar graph
+p = 'PEM-15'
+pData = df.loc[df.Patient_ID == p]
 
-                markers.sort_values('Marker', axis=0, inplace=True)  # sort markers names alphabetically
-                markers.reset_index(drop=True, inplace=True)
+def stackedBarPlots(pData, markers):
+    # this function plots a stacked bar graph
 
-                fig_bar = plt.figure()
-                plt.subplot(2,1,1)
+    markers.sort_values('Marker', axis=0, inplace=True)  # sort markers names alphabetically
+    markers.reset_index(drop=True, inplace=True)
 
-                bar_x = np.arange(len(pData.TimeFromInitialBloodDraw_weeks)) + 0.2
-                barWidth = 0.4
-                y_offset = np.array([0.0] * len(bar_x))
+    fig_bar = plt.figure(figsize=(10,8))
+    plt.subplot(211)
 
-                # Get colors for bars
-                colors = plt.cm.Set1(np.linspace(0, 0.75, len(markers)))
+    bar_x = np.arange(len(pData.TimeFromInitialBloodDraw_weeks)) + 0.2
+    barWidth = 0.4
+    y_offset = np.array([0.0] * len(bar_x))
 
-                for m in xrange(0, len(markers)):  # (start,stop,step)
+    # Get colors for bars
+    colors = plt.cm.Set1(np.linspace(0, 0.75, len(markers)))
 
-                    if len(markers) <= 20:
-                        y = np.log2(pData[markers.ix[m][0]] + 1)  # take log2(x+1)
-                        plt.bar(bar_x, y, barWidth, bottom=y_offset, color=colors[m], label=markers.ix[m, 'Marker'])
-                        y_offset = y_offset + y
+    cell_text2 = []
+    for m in xrange(0, len(markers)):  # (start,stop,step)
 
-                    else:
-                        print 'Number of markers is greater than 20! \Modify for loop code'
+        if len(markers) <= 20:
+            y = np.log2(pData[markers.ix[m][0]] + 1)  # take log2(x+1)
+            plt.bar(bar_x, y, barWidth, bottom=y_offset, color=colors[m], label=markers.ix[m, 'Marker'])
+            y_offset = y_offset + y
 
-                plt.ylabel('log2(x+1)' + '\n (copies / mL)', fontsize=16)
-                plt.xlabel('Time (weeks)', fontsize=16)
-                plt.title(p, fontsize=18)
-                plt.xticks(pd.Series(bar_x) + barWidth / 2, pData.TimeFromInitialBloodDraw_weeks)
-                plt.subplots_adjust(left=None, bottom=None, right=0.75, top=None, wspace=None, hspace=None)
-                plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0, fontsize=10)  # colors,markersSorted['Marker'])
+        else:
+            print 'Number of markers is greater than 20! \Modify for loop code'
 
-                plt.subplot(2,1,2)
+    plt.ylabel('log2(x+1)' + '\n (copies / mL)', fontsize=16)
+    plt.xlabel('Time (weeks)', fontsize=16)
+    plt.title(p, fontsize=18)
+    plt.xticks(pd.Series(bar_x) + barWidth / 2, pData.TimeFromInitialBloodDraw_weeks)
+    plt.subplots_adjust(left=None, bottom=None, right=0.75, top=None, wspace=None, hspace=None)
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0, fontsize=10)  # colors,markersSorted['Marker'])
 
+    plt.subplot(212)
+    ax = plt.gca()
+    ax.axis('off')
+    cellTEXT = [[txt] for txt in pData.ClinicalAnnotations]
+    rowLABELS = [[str(rtxt) + ' weeks'] for rtxt in pData.TimeFromInitialBloodDraw_weeks.tolist()]
+    colLABELS = ['Clinical Annotation']
+    the_table = ax.table(cellText=cellTEXT,colLabels=colLABELS,rowLabels=rowLABELS,loc='center')
+    table_props = the_table.properties()
+    table_cells = table_props['child_artists']
 
-
-            stackedBarPlots(pData,markers)
+stackedBarPlots(pData,markers)
 
             pdf.savefig()
             plt.close()
@@ -158,13 +168,6 @@ def main(inputfile,outputdir):
     #     return statusOut, statusColor, statusDoneOut, statusDoneColor
 
 
-    ## plot stacked barplots
-    #p = 'PEM-15'
-    #pData = df.loc[df.Patient_ID == p]
-
-
-        #plt.show()
-
 
     #stackedBarPlots(pData,markers)
 
@@ -179,11 +182,4 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-
+### TEST
