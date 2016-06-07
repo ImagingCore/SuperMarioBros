@@ -5,7 +5,7 @@ plt.ioff() # turn off intereactive mode so will only display figures if explicit
 from matplotlib.backends.backend_pdf import PdfPages
 import numpy as np
 
-inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/MelData/MelRawDropletData_20160531.csv'
+inputfile = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/MelData/MelRawDropletData_20160607.csv'
 outputdir = '/Users/lindanieman/Documents/WORK/MGH CC/Droplets/MelData/PlotOutput/'
 
 
@@ -24,7 +24,8 @@ def main(inputfile,outputdir):
     path, filename = os.path.split(inputfile)
     root, ext = os.path.splitext(filename)
 
-    markers = pd.DataFrame(['FAT1-1', 'GRP143', 'IL13RA2', 'MAGEA2', 'MAGEC2', 'PMEL', 'SFRP1', 'TFAP2C', 'TNC', 'CSPG4', 'FAT2', 'GAGE1', 'MAGEA1', 'MAGEA4', 'MAGEA6', 'MLANA', 'PRAME', 'SOX10', 'TYRP1']);
+    ### removed first element:  'FAT1-1'
+    markers = pd.DataFrame(['GRP143', 'IL13RA2', 'MAGEA2', 'MAGEC2', 'PMEL', 'SFRP1', 'TFAP2C', 'TNC', 'CSPG4', 'FAT2', 'GAGE1', 'MAGEA1', 'MAGEA4', 'MAGEA6', 'MLANA', 'PRAME', 'SOX10', 'TYRP1']);
     markersTotals = pd.DataFrame(['TotalTranscriptsPerWellPerMlBlood', 'LineageSpecific', 'CarcinoEmbryonicAntigen', 'SignalTransduction']);
     markers.rename(columns={0: 'Marker'}, inplace=True) # rename column
     markersTotals.rename(columns={0: 'MarkersTotals'}, inplace=True) # rename column
@@ -37,10 +38,11 @@ def main(inputfile,outputdir):
         #p = 'PEM01'
         pData = df.loc[df.Patient_ID == p]
 
-        with PdfPages(outputdir + p + '_Log2.pdf') as pdf:
+        with PdfPages(outputdir + p + '_Log2.pdf') as pdf: # LOG2
+        #with PdfPages(outputdir + p + '_RAW.pdf') as pdf:  # RAW
 
             fig = plt.figure(figsize=(12,8))
-            plt.suptitle(p + '\n Log2( Copies/mL + 1) vs. Time (weeks)', fontsize=14, fontweight='bold')
+            plt.suptitle(p + ' Log2(Copies/mL + 1) \n Copies/mL vs. Time (weeks)', fontsize=14, fontweight='bold') #Log2(Copies/mL + 1)
 
             # -------------------------------------------------
             # plot each marker separately as a function of time
@@ -50,12 +52,13 @@ def main(inputfile,outputdir):
 
                     plt.subplot(5,4,m+1)
                     x=pData.TimeFromInitialBloodDraw_weeks
-                    #y=pData[markers.ix[m][0]]
-                    y = np.log2(pData[markers.ix[m][0]] +1) # take log2(x+1)
+                    #y=pData[markers.ix[m][0]] # RAW
+                    y = np.log2(pData[markers.ix[m][0]] +1) # LOG2
                     plt.plot(x, y, '-ro', markersize=10)
 
-                    #plt.ylabel(markers.ix[m][0] + '\n (copies / mL)', fontsize = 8)
-                    plt.ylabel(markers.ix[m][0] + '\n (copies / mL)', fontsize=8) # log2(x+1)
+                    plt.ylabel('log2(' + markers.ix[m][0] + ') \n (copies / mL)', fontsize = 8) # LOG2
+                    #plt.ylabel(markers.ix[m][0] + ' Copies / mL', fontsize=8) # RAW
+                    plt.ylim(ymin=0)
 
                     plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.5, hspace=0.4)
                     ax = plt.gca()
@@ -74,16 +77,19 @@ def main(inputfile,outputdir):
             # ---------------------------------------------------------------------
             # plot totals, lineaage specific, carcinoembryonic, signaltransduction
             fig = plt.figure()
-            plt.suptitle(p + '\n Copies/mL vs. Time (weeks)', fontsize=14, fontweight='bold')
+            # plt.suptitle(p + '\n Copies/mL vs. Time (weeks)', fontsize=14, fontweight='bold') # RAW
+            plt.suptitle(p + '\n Copies/mL vs. Time (weeks)', fontsize=14, fontweight='bold')  # LOG2
             for n in xrange(0,len(markersTotals)):
 
                 plt.subplot(2,2,n+1)
                 x = pData.TimeFromInitialBloodDraw_weeks
-                #y = pData[markersTotals.ix[n][0]]
-                y = np.log2(pData[markersTotals.ix[n][0]] +1) # take log2(x+1)
+                #y = pData[markersTotals.ix[n][0]] # RAW
+                y = np.log2(pData[markersTotals.ix[n][0]] +1) # LOG2
                 plt.plot(x, y, '-ro')
+                plt.ylim(ymin=0)
                 plt.title(markersTotals.ix[n][0], fontsize=12)
-                plt.ylabel('log2(x+1)' + '\n (copies / mL)', fontsize=12)
+                plt.ylabel('log2(x+1)' + '\n (copies / mL)', fontsize=12) # LOG2
+                #plt.ylabel('Copies / mL', fontsize=12)  # 'RAW'
 
                 plt.subplots_adjust(left=0.15, bottom=None, right=0.95, top=0.85, wspace=0.5, hspace=0.4)
                 ax = plt.gca()
